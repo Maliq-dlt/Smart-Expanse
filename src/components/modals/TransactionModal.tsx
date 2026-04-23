@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore, TransactionType } from '@/store/useFinanceStore';
+import { toast } from 'sonner';
 
 const categories = [
   { id: 'food', label: 'Food', icon: 'restaurant' },
@@ -50,6 +51,9 @@ export default function TransactionModal() {
     });
 
     closeTransactionModal();
+    toast.success('Transaksi berhasil ditambahkan!', {
+      description: `${transactionType === 'income' ? 'Pemasukan' : 'Pengeluaran'} Rp ${nominal} untuk ${nama}`,
+    });
     setTimeout(handleReset, 300);
   };
 

@@ -5,6 +5,7 @@ import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, PieChart, Pie, Cell } from 'recharts';
 import MagneticButton from '@/components/ui/MagneticButton';
+import AnimatedNumber from '@/components/ui/AnimatedNumber';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -122,7 +123,7 @@ export default function HomePage() {
             <span className="material-symbols-outlined text-[var(--color-primary-container)] bg-[var(--color-primary-container)]/10 p-1.5 rounded-full text-xl">account_balance</span>
           </div>
           <div>
-            <h3 className="text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1">Rp {formatRupiah(totalBalance)}</h3>
+            <AnimatedNumber value={totalBalance} prefix="Rp " className="block text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1" />
             <div className="flex items-center gap-1 text-[var(--color-primary)] text-sm font-medium">
               <span className="material-symbols-outlined text-sm">trending_up</span>
               <span>Live Updated</span>
@@ -137,7 +138,7 @@ export default function HomePage() {
             <span className="material-symbols-outlined text-[var(--color-primary-container)] bg-[var(--color-primary-container)]/10 p-1.5 rounded-full text-xl">arrow_downward</span>
           </div>
           <div>
-            <h3 className="text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1">Rp {formatRupiah(totalIncome)}</h3>
+            <AnimatedNumber value={totalIncome} prefix="Rp " className="block text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1" />
             <div className="flex items-center gap-1 text-[var(--color-outline)] text-sm">
               <span>All time</span>
             </div>
@@ -151,7 +152,7 @@ export default function HomePage() {
             <span className="material-symbols-outlined text-[var(--color-tertiary-container)] bg-[var(--color-tertiary-container)]/10 p-1.5 rounded-full text-xl">arrow_upward</span>
           </div>
           <div>
-            <h3 className="text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1">Rp {formatRupiah(totalExpense)}</h3>
+            <AnimatedNumber value={totalExpense} prefix="Rp " className="block text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1" />
             <div className="flex items-center gap-1 text-[var(--color-tertiary)] text-sm font-medium">
               <span className="material-symbols-outlined text-sm">trending_up</span>
               <span>All time</span>
@@ -216,8 +217,8 @@ export default function HomePage() {
                 </defs>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="masuk" stroke="var(--color-primary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorMasuk)" />
-                <Area type="monotone" dataKey="keluar" stroke="var(--color-tertiary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorKeluar)" />
+                <Area type="monotone" dataKey="masuk" stroke="var(--color-primary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorMasuk)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
+                <Area type="monotone" dataKey="keluar" stroke="var(--color-tertiary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorKeluar)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -240,6 +241,9 @@ export default function HomePage() {
                         outerRadius={80}
                         paddingAngle={5}
                         dataKey="value"
+                        isAnimationActive={true}
+                        animationDuration={1500}
+                        animationEasing="ease-out"
                         stroke="none"
                       >
                         {pieData.map((entry, index) => (

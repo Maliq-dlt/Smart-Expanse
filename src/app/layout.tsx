@@ -40,6 +40,7 @@ export const metadata: Metadata = {
 };
 
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -77,6 +78,12 @@ export default function RootLayout({
           <ThemeProvider>
             <ModalProvider>
               {children}
+              <Toaster 
+                position="bottom-right" 
+                toastOptions={{
+                  className: "bg-[var(--color-surface-lowest)] text-[var(--color-on-surface)] border border-[var(--color-surface-variant)] shadow-xl rounded-xl font-sans",
+                }}
+              />
             </ModalProvider>
           </ThemeProvider>
         </SmoothScrollProvider>

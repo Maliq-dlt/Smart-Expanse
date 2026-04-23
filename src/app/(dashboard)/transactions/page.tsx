@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFinanceStore } from '@/store/useFinanceStore';
+import { SkeletonTransactionItem } from '@/components/ui/SkeletonCard';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -25,7 +26,16 @@ function formatDate(isoString: string) {
 
 export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const { transactions } = useFinanceStore();
+
+  useEffect(() => {
+    // Simulate network delay for premium feel
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
@@ -141,34 +151,46 @@ export default function TransactionsPage() {
 
         {/* Table Rows */}
         <div className="flex flex-col">
-          {transactions.map((tx, i) => (
-            <motion.div
-              key={tx.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 + i * 0.08 }}
-              className={`grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-[var(--color-surface-low)] transition-colors duration-200 cursor-pointer group ${
-                i < transactions.length - 1 ? 'border-b border-[var(--color-surface-variant)]/30' : ''
-              }`}
-            >
-              <div className="col-span-2 text-sm font-mono text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-on-surface)] transition-colors">{formatDate(tx.date)}</div>
-              <div className="col-span-4 font-medium truncate text-[var(--color-on-surface)]">{tx.desc}</div>
-              <div className="col-span-2 flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  tx.type === 'income' ? 'bg-[var(--color-primary-container)]/20 text-[var(--color-primary)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]'
-                }`}>
-                  <span className="material-symbols-outlined text-[16px]">{tx.type === 'income' ? 'payments' : 'receipt_long'}</span>
-                </div>
-                <span className="text-sm text-[var(--color-on-surface-variant)]">{tx.category}</span>
-              </div>
-              <div className="col-span-2 text-sm text-[var(--color-on-surface-variant)]">{tx.account}</div>
-              <div className={`col-span-2 text-sm font-mono text-right ${tx.type === 'expense' ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`}>
-                {tx.type === 'expense' ? '-' : '+'} Rp {formatRupiah(tx.amount)}
-              </div>
-            </motion.div>
-          ))}
-          {transactions.length === 0 && (
-            <div className="p-8 text-center text-[var(--color-outline)]">Belum ada transaksi.</div>
+          {isLoading ? (
+            <div className="p-4">
+              <SkeletonTransactionItem />
+              <SkeletonTransactionItem />
+              <SkeletonTransactionItem />
+              <SkeletonTransactionItem />
+              <SkeletonTransactionItem />
+            </div>
+          ) : (
+            <>
+              {transactions.map((tx, i) => (
+                <motion.div
+                  key={tx.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + i * 0.08 }}
+                  className={`grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-[var(--color-surface-low)] transition-colors duration-200 cursor-pointer group ${
+                    i < transactions.length - 1 ? 'border-b border-[var(--color-surface-variant)]/30' : ''
+                  }`}
+                >
+                  <div className="col-span-2 text-sm font-mono text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-on-surface)] transition-colors">{formatDate(tx.date)}</div>
+                  <div className="col-span-4 font-medium truncate text-[var(--color-on-surface)]">{tx.desc}</div>
+                  <div className="col-span-2 flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      tx.type === 'income' ? 'bg-[var(--color-primary-container)]/20 text-[var(--color-primary)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]'
+                    }`}>
+                      <span className="material-symbols-outlined text-[16px]">{tx.type === 'income' ? 'payments' : 'receipt_long'}</span>
+                    </div>
+                    <span className="text-sm text-[var(--color-on-surface-variant)]">{tx.category}</span>
+                  </div>
+                  <div className="col-span-2 text-sm text-[var(--color-on-surface-variant)]">{tx.account}</div>
+                  <div className={`col-span-2 text-sm font-mono text-right ${tx.type === 'expense' ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`}>
+                    {tx.type === 'expense' ? '-' : '+'} Rp {formatRupiah(tx.amount)}
+                  </div>
+                </motion.div>
+              ))}
+              {transactions.length === 0 && (
+                <div className="p-8 text-center text-[var(--color-outline)]">Belum ada transaksi.</div>
+              )}
+            </>
           )}
         </div>
 
