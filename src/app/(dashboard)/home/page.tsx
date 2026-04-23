@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, PieChart, Pie, Cell } from 'recharts';
+import MagneticButton from '@/components/ui/MagneticButton';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -97,13 +98,13 @@ export default function HomePage() {
           </h2>
         </motion.div>
         <motion.div variants={fadeUp}>
-          <button
+          <MagneticButton
             onClick={openTransactionModal}
             className="bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)] font-medium py-3 px-6 rounded-lg shadow-soft hover:shadow-hover hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2 w-fit shimmer-btn"
           >
             <span className="material-symbols-outlined">add</span>
             Transaksi Baru
-          </button>
+          </MagneticButton>
         </motion.div>
       </motion.header>
 

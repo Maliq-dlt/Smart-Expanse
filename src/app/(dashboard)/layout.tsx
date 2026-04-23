@@ -9,6 +9,8 @@ const Sidebar = dynamic(() => import('@/components/layout/Sidebar'), { ssr: fals
 const TopBar = dynamic(() => import('@/components/layout/TopBar'), { ssr: false });
 const MobileNav = dynamic(() => import('@/components/layout/MobileNav'), { ssr: false });
 const TransactionModal = dynamic(() => import('@/components/modals/TransactionModal'), { ssr: false });
+const CommandMenu = dynamic(() => import('@/components/ui/CommandMenu'), { ssr: false });
+import PageTransition from '@/components/providers/PageTransition';
 
 export default function DashboardLayout({
   children,
@@ -37,12 +39,13 @@ export default function DashboardLayout({
       <TopBar />
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 pt-20 md:pt-0 pb-24 md:pb-0 overflow-hidden relative">
-        {children}
+      <main className="flex-1 md:ml-64 pt-20 md:pt-0 pb-24 md:pb-0 overflow-hidden relative flex flex-col">
+        <PageTransition>{children}</PageTransition>
       </main>
 
       <MobileNav />
       <TransactionModal />
+      <CommandMenu />
     </div>
   );
 }
