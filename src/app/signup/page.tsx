@@ -28,6 +28,15 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface)] flex flex-col justify-center items-center p-6 relative overflow-hidden">
+      {/* Back Button */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 z-20 flex items-center gap-1 text-sm font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors group"
+      >
+        <span className="material-symbols-outlined text-lg group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+        Kembali
+      </Link>
+
       {/* Background Ornaments */}
       <div className="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-[var(--color-primary-container)] rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob"></div>
       <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[var(--color-secondary-container)] rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob animation-delay-2000"></div>

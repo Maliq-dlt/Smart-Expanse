@@ -20,13 +20,28 @@ export default function LoginPage() {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Mock login
-    login(email, 'Maliq');
+    // Derive name from email (e.g. "john.doe@email.com" → "John Doe")
+    const rawName = email.split('@')[0].replace(/[._-]/g, ' ');
+    const displayName = rawName
+      .split(' ')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+
+    login(email, displayName);
     router.push('/home');
   };
 
   return (
     <div className="min-h-screen bg-[var(--color-surface)] flex flex-col justify-center items-center p-6 relative overflow-hidden">
+      {/* Back Button */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 z-20 flex items-center gap-1 text-sm font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors group"
+      >
+        <span className="material-symbols-outlined text-lg group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+        Kembali
+      </Link>
+
       {/* Background Ornaments */}
       <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[var(--color-primary-container)] rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-[var(--color-tertiary-container)] rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob animation-delay-2000"></div>

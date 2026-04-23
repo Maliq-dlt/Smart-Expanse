@@ -27,8 +27,12 @@ export default function SettingsPage() {
   }, []);
 
   const handleLogout = () => {
-    logout();
-    router.push('/');
+    // Navigate away from the dashboard FIRST to avoid the layout guard
+    // redirecting us to /login before we reach /
+    router.replace('/');
+    setTimeout(() => {
+      logout();
+    }, 100);
   };
 
   return (
