@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { Command } from 'cmdk';
 import { useRouter } from 'next/navigation';
-import { useModalStore } from '@/contexts/ModalContext';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function CommandMenu() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const { openTransactionModal } = useModalStore();
+  const { openTransactionModal } = useModal();
 
   // Toggle the menu when ⌘K is pressed
   useEffect(() => {

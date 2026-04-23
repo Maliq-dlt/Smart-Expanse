@@ -21,9 +21,8 @@ export default function SignupPage() {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Mock signup
-    signup(email, name || 'User');
-    router.push('/home');
+    // After "signup", redirect to login
+    router.push('/login');
   };
 
   return (
