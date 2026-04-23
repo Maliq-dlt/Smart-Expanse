@@ -471,10 +471,10 @@ export default function LandingPage() {
             Bergabung dengan antarmuka yang dirancang untuk kedamaian finansial Anda.
           </p>
           <Link
-            href="/home"
+            href={isMounted && isAuthenticated ? "/home" : "/login"}
             className="inline-flex items-center justify-center px-10 py-5 rounded-full bg-[var(--color-on-surface)] text-[var(--color-surface)] text-lg font-semibold hover:scale-105 transition-transform shadow-2xl shadow-[var(--color-on-surface)]/20"
           >
-            Masuk ke Dashboard
+            {isMounted && isAuthenticated ? "Masuk ke Dashboard" : "Mulai Gratis"}
           </Link>
         </motion.div>
       </section>
