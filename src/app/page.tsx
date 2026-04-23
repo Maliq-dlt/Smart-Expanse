@@ -79,10 +79,10 @@ export default function LandingPage() {
           </div>
           <div className="flex space-x-4 items-center">
             <Link
-              href={isMounted && isAuthenticated ? "/home" : "/login"}
+              href="/login"
               className="group relative px-6 py-2 rounded-full bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)] font-semibold text-sm overflow-hidden transition-transform hover:scale-105 active:scale-95"
             >
-              <span className="relative z-10">{isMounted && isAuthenticated ? "Buka Dashboard" : "Masuk"}</span>
+              <span className="relative z-10">Login</span>
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-full" />
             </Link>
           </div>
