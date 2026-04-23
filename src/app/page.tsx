@@ -90,7 +90,7 @@ export default function LandingPage() {
       </nav>
 
       {/* --- 1. HERO PARALLAX SECTION --- */}
-      <section className="relative pt-40 pb-20 px-6 max-w-7xl mx-auto min-h-[90vh] flex items-center">
+      <section className="relative pt-18 pb-20 px-6 max-w-7xl mx-auto min-h-[90vh] flex items-center">
         {/* Background Decorative Blobs */}
         <div className="absolute top-1/4 left-0 w-96 h-96 bg-[var(--color-primary-container)]/10 rounded-full blur-3xl -z-10 animate-pulse" />
         <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-[var(--color-tertiary-container)]/10 rounded-full blur-3xl -z-10" />
