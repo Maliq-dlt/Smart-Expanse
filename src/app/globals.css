@@ -1,0 +1,272 @@
+@import "tailwindcss";
+
+/* ===================================================================
+   SmartExpense — Organic Financial Integrity Design System
+   Tailwind CSS v4 @theme configuration
+   =================================================================== */
+
+@theme {
+  /* ─── Typography ─── */
+  --font-serif-heading: "Noto Serif", ui-serif, Georgia, serif;
+  --font-sans-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono-number: "Space Grotesk", ui-monospace, monospace;
+  --font-label: "Work Sans", system-ui, sans-serif;
+  --font-dm-serif: "DM Serif Display", serif;
+
+  /* Default Tailwind spacing scale will be used to prevent max-w-* bugs */
+
+  /* ─── Border Radius ─── */
+  --radius-sm: 0.25rem;
+  --radius-DEFAULT: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+
+  /* ─── Shadows ─── */
+  --shadow-soft: 0 4px 20px rgba(44, 62, 80, 0.04);
+  --shadow-hover: 0 8px 30px rgba(44, 62, 80, 0.08);
+  --shadow-modal: 0 24px 60px rgba(44, 62, 80, 0.15);
+
+  /* ─── Light Theme Colors (default) ─── */
+  --color-background: #faf9f5;
+  --color-on-background: #1a1c19;
+  --color-surface: #faf9f5;
+  --color-surface-dim: #dadad5;
+  --color-surface-bright: #faf9f5;
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f4f4ef;
+  --color-surface-container: #eeeee9;
+  --color-surface-high: #e9e8e3;
+  --color-surface-highest: #e3e3de;
+  --color-on-surface: #1a1c19;
+  --color-on-surface-variant: #434841;
+  --color-inverse-surface: #2f312e;
+  --color-inverse-on-surface: #f1f1ec;
+  --color-outline: #737970;
+  --color-outline-variant: #c3c8be;
+  --color-surface-tint: #486646;
+  --color-surface-variant: #e3e3de;
+
+  --color-primary: #486646;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #8faf8a;
+  --color-on-primary-container: #274226;
+  --color-inverse-primary: #aecfa8;
+  --color-primary-fixed: #caecc3;
+  --color-primary-fixed-dim: #aecfa8;
+  --color-on-primary-fixed: #052108;
+  --color-on-primary-fixed-variant: #314d30;
+
+  --color-secondary: #7b5551;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fecbc6;
+  --color-on-secondary-container: #7a5450;
+  --color-secondary-fixed: #ffdad6;
+  --color-secondary-fixed-dim: #ecbbb6;
+  --color-on-secondary-fixed: #2f1411;
+  --color-on-secondary-fixed-variant: #603e3a;
+
+  --color-tertiary: #7f5160;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ce98a8;
+  --color-on-tertiary-container: #58303e;
+  --color-tertiary-fixed: #ffd9e3;
+  --color-tertiary-fixed-dim: #f0b7c8;
+  --color-on-tertiary-fixed: #32101d;
+  --color-on-tertiary-fixed-variant: #643a48;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-warning: #eab308;
+
+  --color-sidebar-bg: #F5F2EC;
+  --color-sidebar-border: #E5E2DC;
+  --color-navy: #2C3E50;
+
+  /* ─── Animations ─── */
+  --animate-shimmer: shimmer 2s infinite;
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scale-in 0.2s ease-out;
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes slide-up {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scale-in {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+}
+
+/* ─── Dark Mode Selector (class-based) ─── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===================================================================
+   Base Styles
+   =================================================================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-sans-body);
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Light mode body texture */
+  body:not(.dark body) {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+  }
+
+  /* Dark mode overrides */
+  .dark body,
+  .dark {
+    --color-background: #1a1c19;
+    --color-on-background: #e3e3de;
+    --color-surface: #1a1c19;
+    --color-surface-dim: #1a1c19;
+    --color-surface-bright: #2f312e;
+    --color-surface-lowest: #252723;
+    --color-surface-low: #1e201d;
+    --color-surface-container: #2f312e;
+    --color-surface-high: #3a3c38;
+    --color-surface-highest: #454742;
+    --color-on-surface: #e3e3de;
+    --color-on-surface-variant: #c3c8be;
+    --color-inverse-surface: #e3e3de;
+    --color-inverse-on-surface: #2f312e;
+    --color-outline: #8d9387;
+    --color-outline-variant: #434841;
+    --color-surface-tint: #aecfa8;
+    --color-surface-variant: #434841;
+
+    --color-primary: #aecfa8;
+    --color-on-primary: #1a3a1a;
+    --color-primary-container: #314d30;
+    --color-on-primary-container: #caecc3;
+    --color-inverse-primary: #486646;
+    --color-primary-fixed: #caecc3;
+    --color-primary-fixed-dim: #aecfa8;
+
+    --color-secondary: #ecbbb6;
+    --color-on-secondary: #442926;
+    --color-secondary-container: #603e3a;
+    --color-on-secondary-container: #ffdad6;
+
+    --color-tertiary: #f0b7c8;
+    --color-on-tertiary: #4a2532;
+    --color-tertiary-container: #643a48;
+    --color-on-tertiary-container: #ffd9e3;
+
+    --color-error: #ffb4ab;
+    --color-on-error: #690005;
+    --color-error-container: #93000a;
+    --color-on-error-container: #ffdad6;
+
+    --color-sidebar-bg: #1e201d;
+    --color-sidebar-border: #2f312e;
+    --color-navy: #e3e3de;
+  }
+
+  /* Selection style */
+  ::selection {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-outline-variant);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-outline);
+  }
+}
+
+/* ===================================================================
+   Component Utilities
+   =================================================================== */
+@layer components {
+  /* Shimmer button effect */
+  .shimmer-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .shimmer-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+    transform: skewX(-20deg);
+    transition: all 0.5s ease;
+  }
+  .shimmer-btn:hover {
+    transform: translateY(-2px);
+  }
+  .shimmer-btn:hover::after {
+    left: 150%;
+  }
+
+  /* Card lift effect */
+  .card-lift {
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+  }
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Shadow utility */
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  .shadow-soft-hover:hover {
+    box-shadow: var(--shadow-hover);
+  }
+}
+
+/* ===================================================================
+   Material Symbols Icon Configuration
+   =================================================================== */
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+.material-symbols-outlined.fill {
+  font-variation-settings: 'FILL' 1;
+}
