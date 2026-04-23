@@ -39,6 +39,8 @@ export const metadata: Metadata = {
   keywords: ["finance", "expense tracker", "budgeting", "financial wellness", "money management"],
 };
 
+import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
+
 export default function RootLayout({
   children,
 }: {
@@ -71,11 +73,13 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased min-h-screen">
-        <ThemeProvider>
-          <ModalProvider>
-            {children}
-          </ModalProvider>
-        </ThemeProvider>
+        <SmoothScrollProvider>
+          <ThemeProvider>
+            <ModalProvider>
+              {children}
+            </ModalProvider>
+          </ThemeProvider>
+        </SmoothScrollProvider>
       </body>
     </html>
   );

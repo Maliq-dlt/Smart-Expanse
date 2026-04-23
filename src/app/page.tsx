@@ -65,7 +65,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="bg-[var(--color-background)] text-[var(--color-on-background)] min-h-screen overflow-hidden selection:bg-[var(--color-primary)] selection:text-white">
+    <div className="bg-[var(--color-background)] text-[var(--color-on-background)] min-h-screen overflow-x-hidden selection:bg-[var(--color-primary)] selection:text-white">
       
       {/* --- Navigation --- */}
       <nav className="fixed top-0 w-full z-50 bg-[var(--color-background)]/80 backdrop-blur-xl border-b border-[var(--color-outline-variant)]/30">
@@ -115,7 +115,7 @@ export default function LandingPage() {
             </motion.p>
             
             <motion.div variants={fadeUp} className="flex items-center gap-4 pt-4">
-              <Link href={isMounted && isAuthenticated ? "/home" : "/signup"} className="shimmer-btn bg-[var(--color-on-surface)] text-[var(--color-surface)] px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2 hover:shadow-xl hover:shadow-[var(--color-on-surface)]/20">
+              <Link href={isMounted && isAuthenticated ? "/home" : "/signup"} className="group shimmer-btn bg-[var(--color-on-surface)] text-[var(--color-surface)] px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2 hover:shadow-xl hover:shadow-[var(--color-on-surface)]/20">
                 Mulai Sekarang
                 <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
               </Link>
@@ -236,7 +236,7 @@ export default function LandingPage() {
             <div className="absolute inset-0 flex items-center justify-center">
               <motion.div 
                 className="w-64 h-64 relative"
-                whileHover={{ scale: 1.05, rotate: 90 }}
+                whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
                 <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-xl">
