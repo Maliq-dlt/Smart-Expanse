@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useFinanceStore } from '@/store/useFinanceStore';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -12,48 +13,27 @@ const stagger = {
   show: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
 
-const accounts = [
-  {
-    name: 'Bank BCA',
-    type: 'Rekening Utama',
-    balance: 3200000,
-    icon: 'account_balance',
-    color: 'primary',
-    lastActivity: [
-      { desc: 'Gaji Bulanan', amount: '+6.500.000', date: 'Kemarin' },
-      { desc: 'Transfer ke E-Wallet', amount: '-500.000', date: '2 hari lalu' },
-    ],
-  },
-  {
-    name: 'Cash',
-    type: 'Dompet',
-    balance: 450000,
-    icon: 'wallet',
-    color: 'secondary',
-    lastActivity: [
-      { desc: 'Kopi Kenangan', amount: '-45.000', date: 'Hari ini' },
-      { desc: 'Makan Siang', amount: '-35.000', date: 'Kemarin' },
-    ],
-  },
-  {
-    name: 'GoPay',
-    type: 'E-Wallet',
-    balance: 600000,
-    icon: 'phone_android',
-    color: 'tertiary',
-    lastActivity: [
-      { desc: 'Top Up dari BCA', amount: '+500.000', date: '2 hari lalu' },
-      { desc: 'Grab Ride', amount: '-32.000', date: '3 hari lalu' },
-    ],
-  },
-];
 
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat('id-ID').format(amount);
 }
 
 export default function AccountsPage() {
+  const { accounts, transactions } = useFinanceStore();
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+
+  // Helper to get last 2 activities for an account
+  const getLastActivities = (accountName: string) => {
+    return transactions
+      .filter(t => t.account === accountName)
+      .slice(0, 2)
+      .map(t => ({
+        desc: t.desc,
+        amount: t.type === 'income' ? `+${formatRupiah(t.amount)}` : `-${formatRupiah(t.amount)}`,
+        date: new Date(t.date).toLocaleDateString('id-ID'),
+        type: t.type
+      }));
+  };
 
   return (
     <div className="p-6 md:p-10 xl:p-16 flex flex-col gap-10 max-w-[1200px] mx-auto w-full">
@@ -98,12 +78,11 @@ export default function AccountsPage() {
             {/* Account Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  account.color === 'primary' ? 'bg-[var(--color-primary-container)]/20 text-[var(--color-primary)]' :
-                  account.color === 'secondary' ? 'bg-[var(--color-secondary-container)]/20 text-[var(--color-secondary)]' :
-                  'bg-[var(--color-tertiary-container)]/20 text-[var(--color-tertiary)]'
-                }`}>
-                  <span className="material-symbols-outlined">{account.icon}</span>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[var(--color-primary-container)]/20 text-[var(--color-primary)]">
+                  <span className="material-symbols-outlined">
+                    {account.type.toLowerCase().includes('bank') ? 'account_balance' : 
+                     account.type.toLowerCase().includes('wallet') ? 'phone_android' : 'wallet'}
+                  </span>
                 </div>
                 <div>
                   <h3 className="font-medium text-[var(--color-on-surface)]">{account.name}</h3>
@@ -125,19 +104,22 @@ export default function AccountsPage() {
             <div>
               <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Aktivitas Terakhir</span>
               <div className="space-y-3">
-                {account.lastActivity.map((activity, j) => (
+                {getLastActivities(account.name).map((activity, j) => (
                   <div key={j} className="flex justify-between items-center text-sm">
                     <div>
                       <p className="text-[var(--color-on-surface)]">{activity.desc}</p>
                       <p className="text-xs text-[var(--color-outline)]">{activity.date}</p>
                     </div>
                     <span className={`font-mono text-sm ${
-                      activity.amount.startsWith('+') ? 'text-[var(--color-primary)]' : 'text-[var(--color-on-surface)]'
+                      activity.type === 'income' ? 'text-[var(--color-primary)]' : 'text-[var(--color-on-surface)]'
                     }`}>
                       {activity.amount}
                     </span>
                   </div>
                 ))}
+                {getLastActivities(account.name).length === 0 && (
+                  <p className="text-sm text-[var(--color-outline)]">Belum ada aktivitas</p>
+                )}
               </div>
             </div>
           </motion.div>

@@ -3,6 +3,7 @@
 import { motion, Variants } from 'framer-motion';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore } from '@/store/useFinanceStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, PieChart, Pie, Cell } from 'recharts';
 import MagneticButton from '@/components/ui/MagneticButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
@@ -60,6 +61,24 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function HomePage() {
   const { openTransactionModal } = useModal();
   const { transactions, getTotalBalance } = useFinanceStore();
+  const user = useAuthStore((s) => s.user);
+
+  // Get greeting based on Jakarta time
+  const getGreeting = () => {
+    const d = new Date();
+    // Get hours in Jakarta (UTC+7)
+    const localTime = d.getTime();
+    const localOffset = d.getTimezoneOffset() * 60000;
+    const utc = localTime + localOffset;
+    const jakartaTime = utc + (3600000 * 7);
+    const jktDate = new Date(jakartaTime);
+    const hour = jktDate.getHours();
+
+    if (hour >= 5 && hour < 12) return 'Selamat Pagi';
+    if (hour >= 12 && hour < 15) return 'Selamat Siang';
+    if (hour >= 15 && hour < 18) return 'Selamat Sore';
+    return 'Selamat Malam';
+  };
 
   const totalBalance = getTotalBalance();
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
@@ -95,7 +114,7 @@ export default function HomePage() {
             Overview
           </p>
           <h2 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif">
-            Selamat Pagi, Maliq 👋
+            {getGreeting()}, {user?.name?.split(' ')[0] || 'User'} 👋
           </h2>
         </motion.div>
         <motion.div variants={fadeUp}>

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, Legend } from 'recharts';
+import { useFinanceStore } from '@/store/useFinanceStore';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -51,6 +52,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function ReportsPage() {
   const [period, setPeriod] = useState<'monthly' | 'weekly' | 'yearly'>('monthly');
+  const { transactions } = useFinanceStore();
+
+  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const netSavings = totalIncome - totalExpense;
+  const savingRate = totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0;
 
   return (
     <div className="p-6 md:p-10 xl:p-16 flex flex-col gap-10 max-w-[1200px] mx-auto w-full">
@@ -87,27 +94,19 @@ export default function ReportsPage() {
       <motion.section className="grid grid-cols-1 md:grid-cols-4 gap-6" initial="hidden" animate="show" variants={stagger}>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Total Pemasukan</span>
-          <h3 className="text-xl font-medium font-mono text-[var(--color-primary)]">Rp 44.000.000</h3>
-          <div className="flex items-center gap-1 text-[var(--color-primary)] text-xs mt-1">
-            <span className="material-symbols-outlined text-xs">trending_up</span>
-            <span>+8.2%</span>
-          </div>
+          <h3 className="text-xl font-medium font-mono text-[var(--color-primary)]">Rp {formatRupiah(totalIncome)}</h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Total Pengeluaran</span>
-          <h3 className="text-xl font-medium font-mono text-[var(--color-error)]">Rp 27.700.000</h3>
-          <div className="flex items-center gap-1 text-[var(--color-error)] text-xs mt-1">
-            <span className="material-symbols-outlined text-xs">trending_down</span>
-            <span>-3.1%</span>
-          </div>
+          <h3 className="text-xl font-medium font-mono text-[var(--color-error)]">Rp {formatRupiah(totalExpense)}</h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Net Savings</span>
-          <h3 className="text-xl font-medium font-mono text-[var(--color-on-surface)]">Rp 16.300.000</h3>
+          <h3 className="text-xl font-medium font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(netSavings)}</h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Saving Rate</span>
-          <h3 className="text-xl font-medium font-mono text-[var(--color-primary)]">37%</h3>
+          <h3 className="text-xl font-medium font-mono text-[var(--color-primary)]">{savingRate}%</h3>
         </motion.div>
       </motion.section>
 
