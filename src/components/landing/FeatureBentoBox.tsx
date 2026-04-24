@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, Variants } from 'framer-motion';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -10,15 +10,18 @@ import CountUpNumber from '@/components/ui/CountUpNumber';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 export default function FeatureBentoBox() {
+  const containerRef = useRef<HTMLElement>(null);
+  
   // GSAP Parallax for Bento Box
   useGSAP(() => {
-    gsap.utils.toArray('[data-speed]').forEach((el: any) => {
+    if (!containerRef.current) return;
+    gsap.utils.toArray('[data-speed]', containerRef.current).forEach((el: any) => {
       const speed = parseFloat(el.getAttribute('data-speed') || '1');
       gsap.to(el, {
         y: () => -100 * speed,
@@ -34,7 +37,7 @@ export default function FeatureBentoBox() {
   }, []);
 
   return (
-    <section id="bento" className="py-24 px-6 max-w-7xl mx-auto">
+    <section ref={containerRef} id="bento" className="py-24 px-6 max-w-7xl mx-auto">
       <motion.div className="text-center mb-16" initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}>
         <h2 className="text-4xl font-serif text-[var(--color-on-surface)] mb-4">Visual. Bukan Teks Panjang.</h2>
         <p className="text-[var(--color-on-surface-variant)]">Lihat kesehatan finansial Anda dalam sekilas.</p>

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
@@ -19,7 +19,7 @@ export default function ThemeFAQ() {
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-24 px-6 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start border-t border-[var(--color-surface-variant)]/30">
+    <section className="py-24 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start border-t border-[var(--color-surface-variant)]/30">
       
       {/* Theme Toggle Visualizer */}
       <div className="space-y-8 sticky top-32">
