@@ -154,16 +154,47 @@ function ScaleRevealComponent() {
 
   const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
   const borderRadius = useTransform(scrollYProgress, [0, 1], ["48px", "0px"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [0, 1]);
 
   return (
     <section ref={ref} className="py-24 px-4 md:px-8 bg-[var(--color-background)] overflow-hidden">
       <motion.div 
-        style={{ scale, borderRadius }}
+        style={{ scale, borderRadius, opacity }}
         className="w-full aspect-video md:aspect-[21/9] bg-[var(--color-surface-lowest)] border border-[var(--color-surface-variant)]/50 shadow-2xl relative overflow-hidden mx-auto max-w-[1400px] flex items-center justify-center group"
       >
+        {/* Animated grid background */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-surface-variant)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-surface-variant)_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-[0.08]" />
         <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-primary)]/10 via-transparent to-[var(--color-tertiary)]/10" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
         
+        {/* Floating mini-UI elements */}
+        <motion.div
+          className="absolute top-8 left-8 bg-[var(--color-surface-low)] backdrop-blur-md px-4 py-2 rounded-xl border border-[var(--color-surface-variant)]/50 shadow-lg hidden md:flex items-center gap-3"
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <span className="material-symbols-outlined text-emerald-500 text-sm">trending_up</span>
+          </div>
+          <div>
+            <div className="text-[10px] text-[var(--color-outline)] uppercase tracking-wider">Pemasukan</div>
+            <div className="text-sm font-mono font-bold text-emerald-500">+12.5%</div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-8 right-8 bg-[var(--color-surface-low)] backdrop-blur-md px-4 py-2 rounded-xl border border-[var(--color-surface-variant)]/50 shadow-lg hidden md:flex items-center gap-3"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        >
+          <div className="w-8 h-8 rounded-full bg-[var(--color-primary-container)]/30 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[var(--color-primary)] text-sm">savings</span>
+          </div>
+          <div>
+            <div className="text-[10px] text-[var(--color-outline)] uppercase tracking-wider">Tabungan</div>
+            <div className="text-sm font-mono font-bold text-[var(--color-primary)]">Rp 24.5M</div>
+          </div>
+        </motion.div>
+
         <div className="text-center z-10 p-8 max-w-3xl">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
@@ -323,6 +354,34 @@ export default function LandingPage() {
         <div className="absolute top-1/4 left-0 w-96 h-96 bg-[var(--color-primary-container)]/10 rounded-full blur-3xl -z-10 animate-pulse" />
         <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-[var(--color-tertiary-container)]/10 rounded-full blur-3xl -z-10" />
 
+        {/* Floating 3D Geometric Shapes */}
+        <motion.div
+          className="absolute top-[15%] left-[8%] w-16 h-16 border-2 border-[var(--color-primary-container)]/30 rounded-xl -z-[5] hidden lg:block"
+          animate={{ rotate: 360, y: [0, -20, 0] }}
+          transition={{ rotate: { duration: 20, repeat: Infinity, ease: "linear" }, y: { duration: 6, repeat: Infinity, ease: "easeInOut" } }}
+          style={{ rotateX, rotateY }}
+        />
+        <motion.div
+          className="absolute top-[30%] right-[12%] w-10 h-10 border-2 border-[var(--color-tertiary-container)]/40 rounded-full -z-[5] hidden lg:block"
+          animate={{ scale: [1, 1.3, 1], y: [0, 15, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[20%] left-[15%] w-6 h-6 bg-[var(--color-primary-container)]/20 rounded-md -z-[5] hidden lg:block"
+          animate={{ rotate: -360, x: [0, 10, 0] }}
+          transition={{ rotate: { duration: 15, repeat: Infinity, ease: "linear" }, x: { duration: 5, repeat: Infinity, ease: "easeInOut" } }}
+        />
+        <motion.div
+          className="absolute top-[60%] right-[5%] w-3 h-3 bg-[var(--color-tertiary)]/30 rounded-full -z-[5] hidden lg:block"
+          animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-[10%] right-[35%] w-20 h-[2px] bg-gradient-to-r from-transparent via-[var(--color-primary-container)]/30 to-transparent -z-[5] hidden lg:block"
+          animate={{ scaleX: [0, 1, 0], opacity: [0, 1, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
           {/* Left: Text Content */}
           <motion.div className="space-y-8 z-10" initial="hidden" animate="show" variants={stagger}>
@@ -450,6 +509,34 @@ export default function LandingPage() {
               <span className="text-sm font-medium text-[var(--color-on-surface-variant)]">{item.label}</span>
               <span className={`text-sm font-mono ${item.type === 'income' ? 'text-emerald-500 font-semibold' : 'text-[var(--color-on-surface)]'}`}>{item.amount}</span>
             </div>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* --- STATS COUNTER BAR --- */}
+      <section className="py-20 px-6 bg-[var(--color-surface-lowest)] border-y border-[var(--color-surface-variant)]/30">
+        <motion.div
+          className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={stagger}
+        >
+          {[
+            { value: 12000, suffix: "+", label: "Pengguna Aktif", icon: "group" },
+            { value: 500, suffix: "K+", label: "Transaksi Tercatat", icon: "receipt_long" },
+            { value: 99, suffix: "%", label: "Uptime Server", icon: "cloud_done" },
+            { value: 4.9, suffix: "/5", label: "Rating Pengguna", icon: "star" },
+          ].map((stat, i) => (
+            <motion.div key={i} variants={fadeUp} className="text-center group">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-[var(--color-primary-container)]/15 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <span className="material-symbols-outlined text-[var(--color-primary)]">{stat.icon}</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-serif font-bold text-[var(--color-on-surface)] mb-1">
+                <CountUpNumber value={stat.value} suffix={stat.suffix} />
+              </h3>
+              <p className="text-sm text-[var(--color-outline)]">{stat.label}</p>
+            </motion.div>
           ))}
         </motion.div>
       </section>
