@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, useTransform, useSpring, useMotionValue } from 'framer-motion';
+import { motion, useTransform, useSpring, useMotionValue, Variants } from 'framer-motion';
 import Link from 'next/link';
 import Magnetic from '@/components/ui/Magnetic';
 import { useAuthStore } from '@/store/useAuthStore';
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-const heroStagger = {
+const heroStagger: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -45,7 +45,7 @@ export default function HeroSection() {
   }, [mouseX, mouseY]);
 
   return (
-    <section className="relative pt-18 pb-20 px-6 max-w-7xl mx-auto min-h-[90vh] flex items-center mt-20">
+    <section className="relative pt-20 pb-20 px-6 max-w-7xl mx-auto">
       {/* Background Decorative Blobs */}
       <div className="absolute top-1/4 left-0 w-96 h-96 bg-[var(--color-primary-container)]/10 rounded-full blur-3xl -z-10 animate-pulse" />
       <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-[var(--color-tertiary-container)]/10 rounded-full blur-3xl -z-10" />
