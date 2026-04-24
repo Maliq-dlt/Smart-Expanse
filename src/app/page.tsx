@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, Variants } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, Variants, useInView, animate } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -30,6 +30,60 @@ const marqueeItems = [
   { icon: 'restaurant', label: 'Makan Malam', amount: '- Rp 120.000', type: 'expense' },
 ];
 
+// --- Helper Components ---
+function MagneticButton({ children, className, ...props }: any) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = ref.current!.getBoundingClientRect();
+    const middleX = clientX - (left + width / 2);
+    const middleY = clientY - (top + height / 2);
+    setPosition({ x: middleX * 0.2, y: middleY * 0.2 });
+  };
+
+  const reset = () => setPosition({ x: 0, y: 0 });
+
+  const { x, y } = position;
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouse}
+      onMouseLeave={reset}
+      animate={{ x, y }}
+      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      className={`w-max ${className || ''}`}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function CountUpNumber({ value, prefix = "", suffix = "" }: { value: number, prefix?: string, suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+  useEffect(() => {
+    if (!isInView) return;
+    const controls = animate(0, value, {
+      duration: 2,
+      ease: "easeOut",
+      onUpdate(val) {
+        if (ref.current) {
+          const formatted = prefix === "Rp " ? 
+             Math.floor(val).toLocaleString('id-ID') : 
+             Math.floor(val).toString();
+          ref.current.textContent = `${prefix}${formatted}${suffix}`;
+        }
+      }
+    });
+    return () => controls.stop();
+  }, [value, isInView, prefix, suffix]);
+
+  return <span ref={ref}>{prefix}0{suffix}</span>;
+}
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuthStore();
@@ -134,10 +188,12 @@ export default function LandingPage() {
             </motion.p>
             
             <motion.div variants={fadeUp} className="flex items-center gap-4 pt-4">
-              <Link href={isMounted && isAuthenticated ? "/home" : "/signup"} className="group shimmer-btn bg-[var(--color-on-surface)] text-[var(--color-surface)] px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2 hover:shadow-xl hover:shadow-[var(--color-on-surface)]/20">
-                Mulai Sekarang
-                <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
-              </Link>
+              <MagneticButton>
+                <Link href={isMounted && isAuthenticated ? "/home" : "/signup"} className="group shimmer-btn bg-[var(--color-on-surface)] text-[var(--color-surface)] px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2 hover:shadow-xl hover:shadow-[var(--color-on-surface)]/20">
+                  Mulai Sekarang
+                  <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+                </Link>
+              </MagneticButton>
             </motion.div>
           </motion.div>
 
@@ -265,7 +321,7 @@ export default function LandingPage() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-xs text-[var(--color-outline)] uppercase tracking-wider font-semibold">Total</span>
-                  <span className="text-lg font-mono font-bold text-[var(--color-on-surface)]">Rp 4.2M</span>
+                  <span className="text-2xl font-mono font-bold text-[var(--color-on-surface)] block mb-3"><CountUpNumber value={6500000} prefix="Rp " /></span>
                 </div>
                 <div className="absolute -right-6 top-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-2 group-hover:translate-x-0">
                   <div className="w-3 h-3 rounded-full bg-[var(--color-primary-container)]" />
@@ -535,7 +591,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                       <h3 className="text-xl font-medium">Liburan Jepang</h3>
-                      <p className="text-sm text-[var(--color-outline)]">Terkumpul: Rp 16.000.000</p>
+                      <p className="text-sm text-[var(--color-outline)]">Terkumpul: <CountUpNumber value={16000000} prefix="Rp " /></p>
                     </div>
                   )}
 
@@ -653,25 +709,76 @@ export default function LandingPage() {
           <p className="text-xl text-[var(--color-on-surface-variant)] mb-10">
             Bergabung dengan antarmuka yang dirancang untuk kedamaian finansial Anda.
           </p>
-          <Link
-            href={isMounted && isAuthenticated ? "/home" : "/login"}
-            className="inline-flex items-center justify-center px-10 py-5 rounded-full bg-[var(--color-on-surface)] text-[var(--color-surface)] text-lg font-semibold hover:scale-105 transition-transform shadow-2xl shadow-[var(--color-on-surface)]/20"
-          >
-            {isMounted && isAuthenticated ? "Masuk ke Dashboard" : "Mulai Gratis"}
-          </Link>
+          <div className="flex justify-center">
+            <MagneticButton>
+              <Link
+                href={isMounted && isAuthenticated ? "/home" : "/login"}
+                className="inline-flex items-center justify-center px-10 py-5 rounded-full bg-[var(--color-on-surface)] text-[var(--color-surface)] text-lg font-semibold hover:scale-105 transition-transform shadow-2xl shadow-[var(--color-on-surface)]/20"
+              >
+                {isMounted && isAuthenticated ? "Masuk ke Dashboard" : "Mulai Gratis"}
+              </Link>
+            </MagneticButton>
+          </div>
         </motion.div>
       </section>
 
-      {/* --- Footer --- */}
-      <footer className="bg-[var(--color-surface-lowest)] py-12 px-8 border-t border-[var(--color-outline-variant)]/20 text-center md:text-left">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div>
-            <div className="text-xl font-bold text-[var(--color-on-surface)] font-serif italic mb-1">SmartExpense.</div>
-            <div className="text-[var(--color-outline)] text-sm">© 2024 Financial Wellness</div>
+      {/* --- 6. PREMIUM MEGAFOOTER --- */}
+      <footer className="bg-[#0a0a0a] text-white pt-24 pb-12 px-6 relative overflow-hidden">
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-emerald-400 mb-8 backdrop-blur-sm">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                All Systems Operational
+              </div>
+              <h3 className="text-3xl font-serif mb-6 text-white/90">Siap mengubah cara Anda <br/>mengelola kekayaan?</h3>
+              <p className="text-white/50 max-w-sm mb-8">
+                SmartExpense adalah standar baru dalam manajemen finansial personal. Cepat, indah, dan dirancang untuk Anda.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-8 md:pl-20">
+              <div>
+                <h4 className="text-white/40 text-xs font-bold uppercase tracking-wider mb-6">Produk</h4>
+                <ul className="space-y-4">
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Fitur</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Keamanan</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Harga</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Changelog</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white/40 text-xs font-bold uppercase tracking-wider mb-6">Perusahaan</h4>
+                <ul className="space-y-4">
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Tentang Kami</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Karir</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Kontak</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Privasi</a></li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-6">
-            <span className="material-symbols-outlined text-[var(--color-outline)] hover:text-[var(--color-primary)] cursor-pointer">language</span>
-            <span className="material-symbols-outlined text-[var(--color-outline)] hover:text-[var(--color-primary)] cursor-pointer">help</span>
+
+          <div className="flex flex-col items-center justify-center border-t border-white/10 pt-16 relative">
+            <h1 className="text-[12vw] font-serif italic font-bold tracking-tighter text-white/5 select-none leading-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center">
+              SmartExpense.
+            </h1>
+            
+            <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+              <div className="text-white/40 text-sm">
+                © 2024 Financial Wellness Inc.
+              </div>
+              <button 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all hover:-translate-y-1"
+              >
+                <span className="material-symbols-outlined">arrow_upward</span>
+              </button>
+            </div>
           </div>
         </div>
       </footer>
