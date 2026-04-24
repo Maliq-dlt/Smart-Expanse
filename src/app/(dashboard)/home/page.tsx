@@ -8,15 +8,15 @@ import MagneticButton from '@/components/ui/MagneticButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 20 } },
 };
 
 const stagger = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
   },
 };
 

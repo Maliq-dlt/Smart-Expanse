@@ -88,17 +88,17 @@ export default function TransactionModal() {
 
           {/* Modal */}
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            className="fixed inset-0 z-50 flex items-end justify-center p-0 md:p-4 md:items-center pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-[var(--color-surface-lowest)] shadow-[var(--shadow-modal)] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-[var(--color-surface-variant)] pointer-events-auto"
-              initial={{ scale: 0.9, y: 40, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.95, y: 20, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="apple-glass shadow-[var(--shadow-modal)] w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-[var(--color-surface-variant)] pointer-events-auto rounded-t-3xl md:rounded-3xl"
+              initial={{ y: "100%", opacity: 0, scale: 1 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: "100%", opacity: 0, scale: 0.95 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.8 }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

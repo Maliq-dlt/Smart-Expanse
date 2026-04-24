@@ -38,7 +38,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside className="hidden md:flex flex-col h-screen w-64 border-r border-[var(--color-sidebar-border)] bg-[var(--color-sidebar-bg)] py-8 px-6 shadow-soft fixed z-20 transition-colors duration-300">
+    <aside className="hidden md:flex flex-col h-screen w-64 border-r border-[var(--color-sidebar-border)] apple-glass py-8 px-6 shadow-soft fixed z-20 transition-colors duration-300">
       {/* Brand */}
       <div className="mb-12">
         <Link href={isMounted && isAuthenticated ? '/home' : '/'}>

@@ -15,8 +15,9 @@ export default function PageTransition({ children }: { children: ReactNode }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
         transition={{ 
-          duration: 0.4, 
-          ease: [0.22, 1, 0.36, 1] // Custom ease-out cubic
+          type: "spring",
+          stiffness: 260,
+          damping: 20
         }}
         className="w-full h-full flex-1 flex flex-col"
       >

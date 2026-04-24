@@ -16,7 +16,7 @@ export default function MobileNav() {
   const { openTransactionModal } = useModal();
 
   return (
-    <nav className="md:hidden fixed bottom-0 w-full bg-[var(--color-surface-lowest)] border-t border-[var(--color-surface-variant)] flex justify-around items-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-40 transition-colors duration-300">
+    <nav className="md:hidden fixed bottom-0 w-full apple-glass border-t border-[var(--color-surface-variant)] flex justify-around items-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-40 transition-colors duration-300">
       {mobileNavItems.slice(0, 2).map((item) => {
         const isActive = pathname === item.href;
         return (

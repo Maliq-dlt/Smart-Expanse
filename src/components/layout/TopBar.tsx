@@ -6,7 +6,7 @@ export default function TopBar() {
   const { openTransactionModal } = useModal();
 
   return (
-    <header className="md:hidden flex justify-between items-center w-full px-6 h-16 bg-[var(--color-surface-lowest)]/80 dark:bg-[var(--color-surface-lowest)]/80 backdrop-blur-md border-b border-[var(--color-sidebar-border)] fixed top-0 z-40 transition-colors duration-300">
+    <header className="md:hidden flex justify-between items-center w-full px-6 h-16 apple-glass border-b border-[var(--color-sidebar-border)] fixed top-0 z-40 transition-colors duration-300">
       <h1 className="text-xl font-bold text-[var(--color-navy)] font-serif">
         SmartExpense
       </h1>
