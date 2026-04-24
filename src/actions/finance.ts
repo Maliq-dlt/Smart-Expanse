@@ -4,18 +4,34 @@ import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
-// ─── Sync User (Upsert) ───
-// Called during login/signup — creates user if doesn't exist, returns user with ID
-export async function syncUser(email: string, name: string) {
-  // Check if user exists
+// ─── Authentication Actions ───
+
+export async function loginUser(email: string, password?: string) {
+  const existing = await db.select().from(schema.users).where(eq(schema.users.email, email));
+  
+  if (existing.length === 0) {
+    throw new Error('Email tidak ditemukan. Silakan daftar terlebih dahulu.');
+  }
+
+  const user = existing[0];
+  
+  // Basic password check (in a real app, use bcrypt)
+  if (user.password && password && user.password !== password) {
+    throw new Error('Password salah.');
+  }
+
+  return user;
+}
+
+export async function signupUser(email: string, name: string, password?: string) {
   const existing = await db.select().from(schema.users).where(eq(schema.users.email, email));
   
   if (existing.length > 0) {
-    return existing[0];
+    throw new Error('Email sudah terdaftar. Silakan login.');
   }
 
   // Create new user
-  const newUser = await db.insert(schema.users).values({ email, name }).returning();
+  const newUser = await db.insert(schema.users).values({ email, name, password }).returning();
   
   // We no longer seed default accounts or budgets.
   // The user will start with completely 0 data and add them manually.

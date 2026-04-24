@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
-import { syncUser } from '@/actions/finance';
+import { signupUser } from '@/actions/finance';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -21,12 +22,14 @@ export default function SignupPage() {
 
     try {
       // Create user in database
-      const dbUser = await syncUser(email, name);
+      const dbUser = await signupUser(email, name, password);
       
       signup(email, dbUser.name, dbUser.id);
       router.push('/home');
-    } catch (error) {
+      toast.success('Pendaftaran berhasil! Selamat datang di SmartExpense.');
+    } catch (error: any) {
       console.error('Signup failed:', error);
+      toast.error(error.message || 'Pendaftaran gagal. Silakan coba lagi.');
       setIsLoading(false);
     }
   };

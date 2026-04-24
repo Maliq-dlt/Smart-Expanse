@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
-import { syncUser } from '@/actions/finance';
+import { loginUser } from '@/actions/finance';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,20 +20,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Derive name from email
-      const rawName = email.split('@')[0].replace(/[._-]/g, ' ');
-      const displayName = rawName
-        .split(' ')
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ');
-
-      // Sync user to database (creates if not exists)
-      const dbUser = await syncUser(email, displayName);
+      // Login user
+      const dbUser = await loginUser(email, password);
       
       login(email, dbUser.name, dbUser.id);
       router.push('/home');
-    } catch (error) {
+      toast.success(`Selamat datang kembali, ${dbUser.name}!`);
+    } catch (error: any) {
       console.error('Login failed:', error);
+      toast.error(error.message || 'Login gagal. Periksa kembali email dan password Anda.');
       setIsLoading(false);
     }
   };
