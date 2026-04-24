@@ -1,9 +1,12 @@
 'use client';
 
+import { useRef } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, PieChart, Pie, Cell } from 'recharts';
 import MagneticButton from '@/components/ui/MagneticButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
@@ -56,6 +59,17 @@ export default function HomePage() {
   const { openTransactionModal } = useModal();
   const { transactions, getTotalBalance, goals, budgetCategories } = useFinanceStore();
   const user = useAuthStore((s) => s.user);
+  
+  const txListRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (!txListRef.current) return;
+    // GSAP buttery stagger for transactions
+    gsap.fromTo(txListRef.current.children,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, stagger: 0.05, ease: "back.out(1.2)", duration: 0.5, delay: 0.3 }
+    );
+  }, { scope: txListRef, dependencies: [transactions.length] });
 
   // Get greeting based on Jakarta time
   const getGreeting = () => {
@@ -102,7 +116,7 @@ export default function HomePage() {
   }, {} as Record<string, { name: string, masuk: number, keluar: number }>);
 
   // Sort by day number
-  const chartData = Object.values(chartDataMap).sort((a, b) => parseInt(a.name) - parseInt(b.name));
+  const chartData = Object.values(chartDataMap).sort((a: any, b: any) => parseInt(a.name) - parseInt(b.name));
 
   // Dynamic Savings Goal
   const totalGoalTarget = goals.reduce((sum, g) => sum + g.target, 0);
@@ -324,13 +338,10 @@ export default function HomePage() {
               Lihat Semua
             </a>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1" ref={txListRef}>
             {recentTransactions.map((tx) => (
-              <motion.div
+              <div
                 key={tx.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
                 className="flex items-center justify-between p-3 hover:bg-[var(--color-surface)] rounded-lg transition-colors group cursor-pointer border border-transparent hover:border-[var(--color-surface-variant)]"
               >
                 <div className="flex items-center gap-4">
@@ -349,7 +360,7 @@ export default function HomePage() {
                 <span className={`text-sm font-normal font-mono ${tx.type === 'income' ? 'text-[var(--color-primary)]' : 'text-[var(--color-on-surface)]'}`}>
                   {tx.type === 'income' ? '+' : '-'} Rp {formatRupiah(tx.amount)}
                 </span>
-              </motion.div>
+              </div>
             ))}
             {recentTransactions.length === 0 && (
               <EmptyState icon="receipt_long" title="Belum Ada Transaksi" description="Mulai catat transaksi pertamamu untuk melihat riwayat keuangan di sini." actionLabel="Transaksi Baru" onAction={openTransactionModal} />

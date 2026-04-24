@@ -8,6 +8,7 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Magnetic from '@/components/ui/Magnetic';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,36 +45,7 @@ const marqueeItems = [
   { icon: 'restaurant', label: 'Makan Malam', amount: '- Rp 120.000', type: 'expense' },
 ];
 
-// --- Helper Components ---
-function MagneticButton({ children, className, ...props }: any) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { clientX, clientY } = e;
-    const { height, width, left, top } = ref.current!.getBoundingClientRect();
-    const middleX = clientX - (left + width / 2);
-    const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * 0.2, y: middleY * 0.2 });
-  };
-
-  const reset = () => setPosition({ x: 0, y: 0 });
-
-  const { x, y } = position;
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouse}
-      onMouseLeave={reset}
-      animate={{ x, y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      className={`w-max ${className || ''}`}
-      {...props}
-    >
-      {children}
-    </motion.div>
-  );
-}
+// MagneticButton removed, now importing Magnetic directly from components
 
 function CountUpNumber({ value, prefix = "", suffix = "" }: { value: number, prefix?: string, suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -336,6 +308,23 @@ export default function LandingPage() {
   const [previewTheme, setPreviewTheme] = useState<'dark' | 'light'>('dark');
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
 
+  // GSAP Parallax for Bento Box
+  useGSAP(() => {
+    gsap.utils.toArray('[data-speed]').forEach((el: any) => {
+      const speed = parseFloat(el.getAttribute('data-speed') || '1');
+      gsap.to(el, {
+        y: () => -100 * speed,
+        ease: "none",
+        scrollTrigger: {
+          trigger: el.parentElement,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        }
+      });
+    });
+  }, []);
+
   const faqs = [
     { q: "Apakah data finansial saya aman?", a: "Ya, kami tidak menyimpan kredensial bank Anda. Semua data diamankan dengan enkripsi standar industri." },
     { q: "Apakah aplikasi ini gratis?", a: "Fitur dasar pencatatan selamanya gratis. Kami tidak akan pernah mengunci data Anda." },
@@ -497,12 +486,12 @@ export default function LandingPage() {
             </motion.p>
             
             <motion.div variants={fadeUp} className="flex items-center gap-4 pt-4">
-              <MagneticButton>
+              <Magnetic>
                 <Link href={isMounted && isAuthenticated ? "/home" : "/signup"} className="group shimmer-btn bg-[var(--color-on-surface)] text-[var(--color-surface)] px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2 hover:shadow-xl hover:shadow-[var(--color-on-surface)]/20">
                   Mulai Sekarang
                   <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
                 </Link>
-              </MagneticButton>
+              </Magnetic>
             </motion.div>
           </motion.div>
 
@@ -529,6 +518,7 @@ export default function LandingPage() {
 
               {/* Floating Element 1 (Balance) */}
               <motion.div 
+                data-speed="1.2"
                 style={{ translateZ: 50 }}
                 className="bg-[var(--color-primary-container)]/10 p-6 rounded-2xl mb-6 shadow-lg border border-[var(--color-primary-container)]/20 backdrop-blur-md"
               >
@@ -546,6 +536,7 @@ export default function LandingPage() {
 
               {/* Floating Element 2 (Chart) */}
               <motion.div 
+                data-speed="0.8"
                 style={{ translateZ: 30 }}
                 className="flex items-end gap-3 h-32 mb-6 px-2"
               >
@@ -564,6 +555,7 @@ export default function LandingPage() {
 
               {/* Floating Element 3 (Floating Card) */}
               <motion.div 
+                data-speed="1.5"
                 style={{ translateZ: 80 }}
                 className="absolute -right-12 bottom-12 bg-[var(--color-surface-lowest)] p-4 rounded-2xl shadow-xl border border-[var(--color-surface-variant)] flex items-center gap-4"
                 animate={{ y: [0, -10, 0] }}
@@ -1083,14 +1075,14 @@ export default function LandingPage() {
             Bergabung dengan antarmuka yang dirancang untuk kedamaian finansial Anda.
           </p>
           <div className="flex justify-center">
-            <MagneticButton>
+            <Magnetic>
               <Link
                 href={isMounted && isAuthenticated ? "/home" : "/login"}
                 className="inline-flex items-center justify-center px-10 py-5 rounded-full bg-[var(--color-on-surface)] text-[var(--color-surface)] text-lg font-semibold hover:scale-105 transition-transform shadow-2xl shadow-[var(--color-on-surface)]/20"
               >
                 {isMounted && isAuthenticated ? "Masuk ke Dashboard" : "Mulai Gratis"}
               </Link>
-            </MagneticButton>
+            </Magnetic>
           </div>
         </motion.div>
       </section>
