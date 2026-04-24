@@ -17,22 +17,8 @@ export async function syncUser(email: string, name: string) {
   // Create new user
   const newUser = await db.insert(schema.users).values({ email, name }).returning();
   
-  // Seed default accounts for new user
-  await db.insert(schema.accounts).values([
-    { userId: newUser[0].id, name: 'Bank BCA', type: 'Rekening Utama', balance: 0 },
-    { userId: newUser[0].id, name: 'Cash', type: 'Dompet', balance: 0 },
-    { userId: newUser[0].id, name: 'GoPay', type: 'E-Wallet', balance: 0 },
-  ]);
-
-  // Seed default budget categories
-  await db.insert(schema.budgetCategories).values([
-    { userId: newUser[0].id, name: 'Belanja Harian', icon: 'shopping_cart', allocated: 3000000, spent: 0 },
-    { userId: newUser[0].id, name: 'Transportasi', icon: 'directions_car', allocated: 1500000, spent: 0 },
-    { userId: newUser[0].id, name: 'Makanan & Minuman', icon: 'restaurant', allocated: 2000000, spent: 0 },
-    { userId: newUser[0].id, name: 'Hiburan', icon: 'movie', allocated: 500000, spent: 0 },
-    { userId: newUser[0].id, name: 'Tagihan & Utilitas', icon: 'receipt_long', allocated: 1200000, spent: 0 },
-    { userId: newUser[0].id, name: 'Kesehatan', icon: 'health_and_safety', allocated: 500000, spent: 0 },
-  ]);
+  // We no longer seed default accounts or budgets.
+  // The user will start with completely 0 data and add them manually.
 
   return newUser[0];
 }
