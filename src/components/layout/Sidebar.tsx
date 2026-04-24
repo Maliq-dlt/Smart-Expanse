@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, LayoutGroup } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useEffect, useState } from 'react';
 
@@ -58,15 +58,23 @@ export default function Sidebar() {
         initial="hidden"
         animate="show"
       >
+        <LayoutGroup>
         {navItems.map((navItem) => {
           const isActive = pathname === navItem.href;
           return (
-            <motion.div key={navItem.href} variants={item}>
+            <motion.div key={navItem.href} variants={item} className="relative">
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 bg-[var(--color-primary-container)]/10 rounded-lg border-r-2 border-[var(--color-primary)]"
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                />
+              )}
               <Link
                 href={navItem.href}
-                className={`flex items-center space-x-3 p-3 rounded-lg font-medium transition-all duration-200 group ${
+                className={`relative z-10 flex items-center space-x-3 p-3 rounded-lg font-medium transition-all duration-200 group ${
                   isActive
-                    ? 'text-[var(--color-primary-container)] dark:text-[var(--color-primary)] font-semibold border-r-2 border-[var(--color-primary-container)] dark:border-[var(--color-primary)] pr-4 bg-[var(--color-primary-container)]/5'
+                    ? 'text-[var(--color-primary)] font-semibold'
                     : 'text-[var(--color-navy)]/70 dark:text-[var(--color-on-surface-variant)] hover:bg-[var(--color-sidebar-border)] dark:hover:bg-[var(--color-surface-container)] hover:translate-x-1'
                 }`}
               >
@@ -78,6 +86,7 @@ export default function Sidebar() {
             </motion.div>
           );
         })}
+        </LayoutGroup>
       </motion.nav>
 
       {/* Bottom Section */}
