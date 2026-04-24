@@ -19,18 +19,19 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isHydrated } = useAuthStore();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    if (!isAuthenticated) {
-      router.push('/login');
+    // Only check auth status after Zustand has hydrated from localStorage
+    if (isHydrated && !isAuthenticated) {
+      router.push('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isHydrated, router]);
 
   // Prevent hydration mismatch and hide content before redirect
-  if (!isMounted || !isAuthenticated) {
+  if (!isMounted || !isHydrated || !isAuthenticated) {
     return <div className="min-h-screen bg-[var(--color-background)]" />;
   }
 

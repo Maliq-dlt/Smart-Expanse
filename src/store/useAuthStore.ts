@@ -10,6 +10,8 @@ export interface User {
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
+  isHydrated: boolean;
+  setHydrated: (state: boolean) => void;
   login: (email: string, name: string, userId: string) => void;
   signup: (email: string, name: string, userId: string) => void;
   logout: () => void;
@@ -20,6 +22,8 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       isAuthenticated: false,
       user: null,
+      isHydrated: false,
+      setHydrated: (state) => set({ isHydrated: state }),
 
       login: (email, name, userId) =>
         set(() => ({
@@ -41,6 +45,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'smartexpense-auth-storage', // name of the item in the storage (must be unique)
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
     }
   )
 );

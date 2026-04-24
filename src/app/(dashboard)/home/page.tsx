@@ -21,15 +21,7 @@ const stagger: Variants = {
   },
 };
 
-const chartData = [
-  { name: '1', masuk: 4000, keluar: 2400 },
-  { name: '5', masuk: 3000, keluar: 1398 },
-  { name: '10', masuk: 2000, keluar: 4800 },
-  { name: '15', masuk: 2780, keluar: 3908 },
-  { name: '20', masuk: 1890, keluar: 4800 },
-  { name: '25', masuk: 2390, keluar: 3800 },
-  { name: '30', masuk: 3490, keluar: 4300 },
-];
+
 
 const categoryColors = ['var(--color-primary-container)', 'var(--color-tertiary-container)', 'var(--color-inverse-primary)', 'var(--color-secondary-container)'];
 
@@ -60,7 +52,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function HomePage() {
   const { openTransactionModal } = useModal();
-  const { transactions, getTotalBalance } = useFinanceStore();
+  const { transactions, getTotalBalance, goals } = useFinanceStore();
   const user = useAuthStore((s) => s.user);
 
   // Get greeting based on Jakarta time
@@ -84,19 +76,36 @@ export default function HomePage() {
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
-  // Group transactions by category for PieChart
+  // Dynamic pie data
   const expensesByCategory = transactions
     .filter(t => t.type === 'expense')
-    .reduce((acc: any, t) => {
+    .reduce((acc, t) => {
       acc[t.category] = (acc[t.category] || 0) + t.amount;
       return acc;
-    }, {});
-  
-  const pieData = Object.keys(expensesByCategory).map((key, index) => ({
-    name: key,
-    value: expensesByCategory[key],
+    }, {} as Record<string, number>);
+
+  const pieData = Object.entries(expensesByCategory).map(([name, value], index) => ({
+    name,
+    value,
     color: categoryColors[index % categoryColors.length]
   }));
+
+  // Dynamic Chart Data
+  const chartDataMap = transactions.reduce((acc, t) => {
+    const day = new Date(t.date).getDate().toString();
+    if (!acc[day]) acc[day] = { name: day, masuk: 0, keluar: 0 };
+    if (t.type === 'income') acc[day].masuk += t.amount;
+    else acc[day].keluar += t.amount;
+    return acc;
+  }, {} as Record<string, { name: string, masuk: number, keluar: number }>);
+
+  // Sort by day number
+  const chartData = Object.values(chartDataMap).sort((a, b) => parseInt(a.name) - parseInt(b.name));
+
+  // Dynamic Savings Goal
+  const totalGoalTarget = goals.reduce((sum, g) => sum + g.target, 0);
+  const totalGoalCurrent = goals.reduce((sum, g) => sum + g.current, 0);
+  const savingsProgress = totalGoalTarget > 0 ? Math.round((totalGoalCurrent / totalGoalTarget) * 100) : 0;
 
   const recentTransactions = transactions.slice(0, 5);
 
@@ -186,12 +195,12 @@ export default function HomePage() {
             <span className="material-symbols-outlined text-[var(--color-secondary-container)] bg-[var(--color-secondary-container)]/10 p-1.5 rounded-full text-xl">savings</span>
           </div>
           <div>
-            <h3 className="text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1">68%</h3>
+            <h3 className="text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1">{savingsProgress}%</h3>
             <div className="w-full bg-[var(--color-surface-high)] rounded-full h-2 mt-2 overflow-hidden">
               <motion.div
                 className="bg-[var(--color-primary-container)] h-full rounded-full"
                 initial={{ width: 0 }}
-                animate={{ width: '68%' }}
+                animate={{ width: `${savingsProgress}%` }}
                 transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
               />
             </div>
@@ -222,24 +231,30 @@ export default function HomePage() {
             </div>
           </div>
           <div className="relative h-64 w-full flex items-end pt-4 pb-4">
-            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-              <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorMasuk" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-primary-container)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--color-primary-container)" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorKeluar" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-tertiary-container)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--color-tertiary-container)" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="masuk" stroke="var(--color-primary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorMasuk)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
-                <Area type="monotone" dataKey="keluar" stroke="var(--color-tertiary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorKeluar)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorMasuk" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-primary-container)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--color-primary-container)" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorKeluar" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-tertiary-container)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--color-tertiary-container)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="masuk" stroke="var(--color-primary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorMasuk)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
+                  <Area type="monotone" dataKey="keluar" stroke="var(--color-tertiary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorKeluar)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-[var(--color-outline)] border border-dashed border-[var(--color-outline)]/20 rounded-xl">
+                Belum ada data transaksi
+              </div>
+            )}
           </div>
         </motion.div>
 

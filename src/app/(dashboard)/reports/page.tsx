@@ -15,21 +15,7 @@ const stagger = {
   show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
-const monthlyData = [
-  { month: 'Jul', income: 6500000, expense: 4200000 },
-  { month: 'Aug', income: 6500000, expense: 3800000 },
-  { month: 'Sep', income: 7000000, expense: 4500000 },
-  { month: 'Oct', income: 6500000, expense: 5100000 },
-  { month: 'Nov', income: 8000000, expense: 3900000 },
-  { month: 'Dec', income: 9500000, expense: 6200000 },
-];
 
-const topCategories = [
-  { name: 'Housing', amount: 2400000, percentage: 40, color: 'primary-container' },
-  { name: 'Food & Dining', amount: 1800000, percentage: 30, color: 'tertiary-container' },
-  { name: 'Transport', amount: 1200000, percentage: 20, color: 'inverse-primary' },
-  { name: 'Entertainment', amount: 600000, percentage: 10, color: 'secondary-container' },
-];
 
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat('id-ID').format(amount);
@@ -58,6 +44,37 @@ export default function ReportsPage() {
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
   const netSavings = totalIncome - totalExpense;
   const savingRate = totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0;
+
+  // Dynamic monthly data
+  const monthlyMap = transactions.reduce((acc, t) => {
+    const month = new Date(t.date).toLocaleString('en-US', { month: 'short' });
+    if (!acc[month]) acc[month] = { month, income: 0, expense: 0, _order: new Date(t.date).getMonth() };
+    if (t.type === 'income') acc[month].income += t.amount;
+    else acc[month].expense += t.amount;
+    return acc;
+  }, {} as Record<string, { month: string, income: number, expense: number, _order: number }>);
+  
+  const monthlyData = Object.values(monthlyMap).sort((a, b) => a._order - b._order);
+
+  // Dynamic top categories
+  const catColors = ['primary-container', 'tertiary-container', 'inverse-primary', 'secondary-container', 'error', 'outline'];
+  const catMap = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((acc, t) => {
+      acc[t.category] = (acc[t.category] || 0) + t.amount;
+      return acc;
+    }, {} as Record<string, number>);
+
+  const sortedCats = Object.entries(catMap)
+    .sort(([,a], [,b]) => b - a)
+    .slice(0, 4);
+
+  const topCategories = sortedCats.map(([name, amount], idx) => ({
+    name,
+    amount,
+    percentage: totalExpense > 0 ? Math.round((amount / totalExpense) * 100) : 0,
+    color: catColors[idx % catColors.length]
+  }));
 
   return (
     <div className="p-6 md:p-10 xl:p-16 flex flex-col gap-10 max-w-[1200px] mx-auto w-full">
@@ -122,17 +139,23 @@ export default function ReportsPage() {
         </div>
 
         {/* Bar Chart */}
-        <div className="h-72 w-full mt-4">
-          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-            <BarChart data={monthlyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} barGap={8}>
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
-              <Tooltip cursor={{ fill: 'var(--color-surface-container)' }} content={<CustomTooltip />} />
-              <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
-              <Bar dataKey="income" name="Pemasukan" fill="var(--color-primary-container)" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              <Bar dataKey="expense" name="Pengeluaran" fill="var(--color-tertiary-container)" radius={[4, 4, 0, 0]} maxBarSize={40} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+          <div className="h-[300px] w-full pt-6">
+            {monthlyData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                <BarChart data={monthlyData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barGap={8}>
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--color-surface-container)' }} />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
+                  <Bar dataKey="income" name="Pemasukan" fill="var(--color-primary-container)" radius={[4, 4, 0, 0]} maxBarSize={40} isAnimationActive={true} animationDuration={1000} />
+                  <Bar dataKey="expense" name="Pengeluaran" fill="var(--color-tertiary-container)" radius={[4, 4, 0, 0]} maxBarSize={40} isAnimationActive={true} animationDuration={1000} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-[var(--color-outline)] border border-dashed border-[var(--color-outline)]/20 rounded-xl">
+                Belum ada data transaksi
+              </div>
+            )}
+          </div>
       </motion.div>
 
       {/* Category Breakdown */}
@@ -149,23 +172,33 @@ export default function ReportsPage() {
             Export
           </button>
         </div>
-        <div className="space-y-4">
-          {topCategories.map((cat, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className={`w-3 h-3 rounded-full bg-[var(--color-${cat.color})]`}></div>
-              <span className="w-32 text-sm text-[var(--color-on-surface)]">{cat.name}</span>
-              <div className="flex-1 bg-[var(--color-surface-container)] h-2 rounded-full overflow-hidden">
-                <motion.div
-                  className={`bg-[var(--color-${cat.color})] h-full rounded-full`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${cat.percentage}%` }}
-                  transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
-                />
+        <div className="flex flex-col justify-center h-full gap-6">
+          {topCategories.length > 0 ? (
+            topCategories.map((category, idx) => (
+              <div key={idx} className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full bg-[var(--color-${category.color})]`}></div>
+                    <span className="text-sm font-medium text-[var(--color-on-surface)]">{category.name}</span>
+                  </div>
+                  <span className="text-sm font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(category.amount)}</span>
+                </div>
+                <div className="w-full bg-[var(--color-surface-container)] rounded-full h-1.5 overflow-hidden flex items-center">
+                  <motion.div
+                    className={`h-full bg-[var(--color-${category.color})]`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${category.percentage}%` }}
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 * idx }}
+                  />
+                </div>
               </div>
-              <span className="w-28 text-right text-sm font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(cat.amount)}</span>
-              <span className="w-10 text-right text-sm font-mono text-[var(--color-outline)]">{cat.percentage}%</span>
+            ))
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center text-[var(--color-outline)] py-10">
+              <span className="material-symbols-outlined text-4xl mb-2 opacity-50">receipt_long</span>
+              <span className="text-sm">Belum ada pengeluaran</span>
             </div>
-          ))}
+          )}
         </div>
       </motion.div>
     </div>
