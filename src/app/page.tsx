@@ -221,8 +221,28 @@ function ScaleRevealComponent() {
 
 function HorizontalTestimonials() {
   const targetRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: targetRef });
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-60%"]);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ 
+    target: targetRef,
+    offset: ["start start", "end end"]
+  });
+  const [scrollRange, setScrollRange] = useState(0);
+
+  useEffect(() => {
+    const update = () => {
+      if (trackRef.current) {
+        const scrollWidth = trackRef.current.scrollWidth;
+        const viewportWidth = window.innerWidth;
+        setScrollRange(-(scrollWidth - viewportWidth));
+      }
+    };
+    // Give it a tiny delay to ensure fonts/layout are rendered
+    setTimeout(update, 100);
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const x = useTransform(scrollYProgress, [0, 1], [0, scrollRange]);
 
   const testimonials = [
     { text: "SmartExpense merubah cara saya melihat uang. UI-nya sangat memanjakan mata.", author: "Budi S.", role: "Freelancer" },
@@ -239,7 +259,11 @@ function HorizontalTestimonials() {
           <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-surface)] drop-shadow-2xl">Apa Kata Mereka.</h2>
           <p className="text-[var(--color-outline)] mt-4 text-lg">Kisah sukses dari pengguna setia kami.</p>
         </div>
-        <motion.div style={{ x }} className="flex gap-6 md:gap-8 pl-[10vw] md:pl-[45vw] pr-[5vw] mt-24 md:mt-0">
+        <motion.div 
+          ref={trackRef}
+          style={{ x }} 
+          className="flex gap-6 md:gap-8 w-max pl-[10vw] md:pl-[45vw] pr-[5vw] mt-24 md:mt-0"
+        >
           {testimonials.map((t, i) => (
             <div key={i} className="w-[350px] md:w-[450px] h-[300px] shrink-0 bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] p-8 rounded-3xl flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500">
               <span className="material-symbols-outlined text-[var(--color-primary-container)] text-5xl mb-4 opacity-50">format_quote</span>
