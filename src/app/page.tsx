@@ -5,6 +5,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
 import Lenis from 'lenis';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 // --- Shared Animations ---
 const fadeUp: Variants = {
@@ -220,29 +225,31 @@ function ScaleRevealComponent() {
 }
 
 function HorizontalTestimonials() {
-  const targetRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ 
-    target: targetRef,
-    offset: ["start start", "end end"]
-  });
-  const [scrollRange, setScrollRange] = useState(0);
 
-  useEffect(() => {
-    const update = () => {
-      if (trackRef.current) {
-        const scrollWidth = trackRef.current.scrollWidth;
-        const viewportWidth = window.innerWidth;
-        setScrollRange(-(scrollWidth - viewportWidth));
-      }
-    };
-    // Give it a tiny delay to ensure fonts/layout are rendered
-    setTimeout(update, 100);
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
+  useGSAP(() => {
+    const track = trackRef.current;
+    if (!track) return;
 
-  const x = useTransform(scrollYProgress, [0, 1], [0, scrollRange]);
+    // The total distance to translate is the track's scroll width minus the viewport width
+    const getScrollAmount = () => track.scrollWidth - window.innerWidth;
+
+    const tween = gsap.to(track, {
+      x: () => -getScrollAmount(),
+      ease: "none"
+    });
+
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "top top",
+      end: () => `+=${getScrollAmount()}`,
+      pin: true,
+      animation: tween,
+      scrub: 1, // Smooth scrubbing
+      invalidateOnRefresh: true, // Recalculate on resize
+    });
+  }, { scope: sectionRef });
 
   const testimonials = [
     { text: "SmartExpense merubah cara saya melihat uang. UI-nya sangat memanjakan mata.", author: "Budi S.", role: "Freelancer" },
@@ -253,31 +260,28 @@ function HorizontalTestimonials() {
   ];
 
   return (
-    <section ref={targetRef} className="relative h-[250vh] bg-[var(--color-surface-lowest)]">
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        <div className="absolute top-24 md:top-32 left-6 md:left-[10%] z-10 pointer-events-none md:w-1/3">
-          <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-surface)] drop-shadow-2xl">Apa Kata Mereka.</h2>
-          <p className="text-[var(--color-outline)] mt-4 text-lg">Kisah sukses dari pengguna setia kami.</p>
-        </div>
-        <motion.div 
-          ref={trackRef}
-          style={{ x }} 
-          className="flex gap-6 md:gap-8 w-max pl-[10vw] md:pl-[45vw] pr-[5vw] mt-24 md:mt-0"
-        >
-          {testimonials.map((t, i) => (
-            <div key={i} className="w-[350px] md:w-[450px] h-[300px] shrink-0 bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] p-8 rounded-3xl flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500">
-              <span className="material-symbols-outlined text-[var(--color-primary-container)] text-5xl mb-4 opacity-50">format_quote</span>
-              <p className="text-xl md:text-2xl font-serif text-[var(--color-on-surface)] leading-snug">"{t.text}"</p>
-              <div className="mt-8 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-tertiary)] flex items-center justify-center text-white font-bold text-lg shadow-inner">{t.author.charAt(0)}</div>
-                <div>
-                  <div className="font-semibold text-[var(--color-on-surface)]">{t.author}</div>
-                  <div className="text-xs text-[var(--color-outline)] uppercase tracking-wider">{t.role}</div>
-                </div>
+    <section ref={sectionRef} className="h-screen bg-[var(--color-surface-lowest)] overflow-hidden relative">
+      <div className="absolute top-24 md:top-32 left-6 md:left-[10%] z-10 pointer-events-none md:w-1/3">
+        <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-surface)] drop-shadow-2xl">Apa Kata Mereka.</h2>
+        <p className="text-[var(--color-outline)] mt-4 text-lg">Kisah sukses dari pengguna setia kami.</p>
+      </div>
+      <div 
+        ref={trackRef}
+        className="flex gap-6 md:gap-8 w-max h-full items-center pl-[100vw] pr-[5vw] pt-24 md:pt-0"
+      >
+        {testimonials.map((t, i) => (
+          <div key={i} className="w-[350px] md:w-[450px] h-[300px] shrink-0 bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] p-8 rounded-3xl flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500">
+            <span className="material-symbols-outlined text-[var(--color-primary-container)] text-5xl mb-4 opacity-50">format_quote</span>
+            <p className="text-xl md:text-2xl font-serif text-[var(--color-on-surface)] leading-snug">"{t.text}"</p>
+            <div className="mt-8 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-tertiary)] flex items-center justify-center text-white font-bold text-lg shadow-inner">{t.author.charAt(0)}</div>
+              <div>
+                <div className="font-semibold text-[var(--color-on-surface)]">{t.author}</div>
+                <div className="text-xs text-[var(--color-outline)] uppercase tracking-wider">{t.role}</div>
               </div>
             </div>
-          ))}
-        </motion.div>
+          </div>
+        ))}
       </div>
     </section>
   );
