@@ -124,7 +124,7 @@ export default function ReportsPage() {
 
         {/* Bar Chart */}
         <div className="h-72 w-full mt-4">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
             <BarChart data={monthlyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} barGap={8}>
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
               <Tooltip cursor={{ fill: 'var(--color-surface-container)' }} content={<CustomTooltip />} />
