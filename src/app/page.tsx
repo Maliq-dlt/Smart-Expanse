@@ -227,13 +227,15 @@ function ScaleRevealComponent() {
 function HorizontalTestimonials() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     const track = trackRef.current;
-    if (!track) return;
+    const container = containerRef.current;
+    if (!track || !container) return;
 
-    // The total distance to translate is the track's scroll width minus the viewport width
-    const getScrollAmount = () => track.scrollWidth - window.innerWidth;
+    // Calculate scroll amount based on the track's total width minus the visible container's width
+    const getScrollAmount = () => track.scrollWidth - container.offsetWidth;
 
     const tween = gsap.to(track, {
       x: () => -getScrollAmount(),
@@ -260,28 +262,37 @@ function HorizontalTestimonials() {
   ];
 
   return (
-    <section ref={sectionRef} className="h-screen bg-[var(--color-surface-lowest)] overflow-hidden relative">
-      <div className="absolute top-24 md:top-32 left-6 md:left-[10%] z-10 pointer-events-none md:w-1/3">
-        <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-surface)] drop-shadow-2xl">Apa Kata Mereka.</h2>
+    <section ref={sectionRef} className="h-screen bg-[var(--color-surface-lowest)] border-y border-[var(--color-surface-variant)]/30 flex flex-col md:flex-row items-center overflow-hidden">
+      
+      {/* Title Section (Static Left Side) */}
+      <div className="w-full md:w-[35%] px-6 md:pl-[10%] shrink-0 z-20 py-12 md:py-0 relative">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-[var(--color-on-surface)] leading-tight drop-shadow-lg">Apa Kata Mereka.</h2>
         <p className="text-[var(--color-outline)] mt-4 text-lg">Kisah sukses dari pengguna setia kami.</p>
       </div>
-      <div 
-        ref={trackRef}
-        className="flex gap-6 md:gap-8 w-max h-full items-center pl-[100vw] pr-[5vw] pt-24 md:pt-0"
-      >
-        {testimonials.map((t, i) => (
-          <div key={i} className="w-[350px] md:w-[450px] h-[300px] shrink-0 bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] p-8 rounded-3xl flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500">
-            <span className="material-symbols-outlined text-[var(--color-primary-container)] text-5xl mb-4 opacity-50">format_quote</span>
-            <p className="text-xl md:text-2xl font-serif text-[var(--color-on-surface)] leading-snug">"{t.text}"</p>
-            <div className="mt-8 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-tertiary)] flex items-center justify-center text-white font-bold text-lg shadow-inner">{t.author.charAt(0)}</div>
-              <div>
-                <div className="font-semibold text-[var(--color-on-surface)]">{t.author}</div>
-                <div className="text-xs text-[var(--color-outline)] uppercase tracking-wider">{t.role}</div>
+
+      {/* Scrolling Track (Right Side) */}
+      <div ref={containerRef} className="w-full md:w-[65%] h-full flex items-center overflow-hidden relative">
+        {/* Gradient Mask to fade cards before they hit the text */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[var(--color-surface-lowest)] to-transparent z-10 hidden md:block" />
+        
+        <div 
+          ref={trackRef}
+          className="flex gap-6 md:gap-8 w-max px-6 md:px-0 md:pl-[50vw] md:pr-[10vw]"
+        >
+          {testimonials.map((t, i) => (
+            <div key={i} className="w-[350px] md:w-[450px] h-[300px] shrink-0 bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] p-8 rounded-3xl flex flex-col justify-between shadow-xl hover:-translate-y-2 transition-transform duration-500">
+              <span className="material-symbols-outlined text-[var(--color-primary-container)] text-5xl mb-4 opacity-50">format_quote</span>
+              <p className="text-xl md:text-2xl font-serif text-[var(--color-on-surface)] leading-snug">"{t.text}"</p>
+              <div className="mt-8 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-tertiary)] flex items-center justify-center text-white font-bold text-lg shadow-inner">{t.author.charAt(0)}</div>
+                <div>
+                  <div className="font-semibold text-[var(--color-on-surface)]">{t.author}</div>
+                  <div className="text-xs text-[var(--color-outline)] uppercase tracking-wider">{t.role}</div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
