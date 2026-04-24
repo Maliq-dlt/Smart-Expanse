@@ -19,16 +19,17 @@ const stagger: Variants = {
   },
 };
 
-// --- Mock Data for Marquee ---
+// --- Mock Data for Marquee (Elegan) ---
 const marqueeItems = [
-  { icon: '☕', label: 'Ngopi', amount: '-Rp 35.000', color: 'text-rose-500' },
-  { icon: '💼', label: 'Gaji Bulanan', amount: '+Rp 8.500.000', color: 'text-emerald-500' },
-  { icon: '🛒', label: 'Belanja Bulanan', amount: '-Rp 1.200.000', color: 'text-amber-500' },
-  { icon: '🎬', label: 'Nonton Bioskop', amount: '-Rp 150.000', color: 'text-indigo-500' },
-  { icon: '🏠', label: 'Cicilan Rumah', amount: '-Rp 3.000.000', color: 'text-blue-500' },
-  { icon: '✈️', label: 'Tiket Liburan', amount: '-Rp 2.500.000', color: 'text-sky-500' },
-  { icon: '🍔', label: 'Makan Malam', amount: '-Rp 120.000', color: 'text-orange-500' },
+  { icon: 'local_cafe', label: 'Ngopi', amount: '- Rp 35.000', type: 'expense' },
+  { icon: 'payments', label: 'Gaji Bulanan', amount: '+ Rp 8.500.000', type: 'income' },
+  { icon: 'shopping_bag', label: 'Belanja', amount: '- Rp 1.200.000', type: 'expense' },
+  { icon: 'movie', label: 'Nonton Bioskop', amount: '- Rp 150.000', type: 'expense' },
+  { icon: 'home', label: 'Cicilan Rumah', amount: '- Rp 3.000.000', type: 'expense' },
+  { icon: 'flight', label: 'Tiket Liburan', amount: '- Rp 2.500.000', type: 'expense' },
+  { icon: 'restaurant', label: 'Makan Malam', amount: '- Rp 120.000', type: 'expense' },
 ];
+
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuthStore();
@@ -198,19 +199,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* --- 2. INFINITE MARQUEE TICKER --- */}
-      <section className="py-8 bg-[var(--color-surface-low)] border-y border-[var(--color-surface-variant)] overflow-hidden flex whitespace-nowrap">
+      {/* --- 2. ELEGANT MARQUEE TICKER --- */}
+      <section className="py-6 border-y border-[var(--color-surface-variant)]/40 overflow-hidden flex whitespace-nowrap bg-[var(--color-background)]">
         <motion.div
-          className="flex gap-8 px-4 items-center"
+          className="flex gap-4 px-2 items-center"
           animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 25, ease: "linear", repeat: Infinity }}
+          transition={{ duration: 30, ease: "linear", repeat: Infinity }}
         >
           {/* Double array for seamless loop */}
           {[...marqueeItems, ...marqueeItems].map((item, i) => (
-            <div key={i} className="flex items-center gap-3 bg-[var(--color-surface-lowest)] px-5 py-3 rounded-full shadow-sm border border-[var(--color-surface-variant)]/50 hover:scale-105 transition-transform cursor-default">
-              <span className="text-xl">{item.icon}</span>
-              <span className="text-sm font-medium text-[var(--color-on-surface)]">{item.label}</span>
-              <span className={`text-sm font-mono font-bold ${item.color}`}>{item.amount}</span>
+            <div key={i} className="flex items-center gap-3 bg-[var(--color-surface-lowest)]/60 backdrop-blur-sm px-5 py-2.5 rounded-full border border-[var(--color-outline-variant)]/30 cursor-default hover:border-[var(--color-outline-variant)]/60 transition-colors">
+              <span className={`material-symbols-outlined text-sm ${item.type === 'income' ? 'text-emerald-500' : 'text-[var(--color-outline)]'}`}>{item.icon}</span>
+              <span className="text-sm font-medium text-[var(--color-on-surface-variant)]">{item.label}</span>
+              <span className={`text-sm font-mono ${item.type === 'income' ? 'text-emerald-500 font-semibold' : 'text-[var(--color-on-surface)]'}`}>{item.amount}</span>
             </div>
           ))}
         </motion.div>
