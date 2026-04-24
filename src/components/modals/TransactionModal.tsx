@@ -110,7 +110,7 @@ export default function TransactionModal() {
                   <button
                     onClick={handleClose}
                     className="hover:bg-[var(--color-surface-container)] transition-colors p-2 rounded-full"
-                    aria-label="Close"
+                    aria-label="Tutup"
                   >
                     <span className="material-symbols-outlined text-[var(--color-on-surface)]">close</span>
                   </button>
@@ -141,7 +141,7 @@ export default function TransactionModal() {
                 <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                   {/* Nominal */}
                   <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
+                    <label htmlFor="transaction-nominal" className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
                       Nominal
                     </label>
                     <div className="relative flex items-center">
@@ -149,6 +149,7 @@ export default function TransactionModal() {
                         Rp
                       </span>
                       <input
+                        id="transaction-nominal"
                         type="text"
                         value={nominal}
                         onChange={handleNominalChange}
@@ -188,10 +189,11 @@ export default function TransactionModal() {
 
                   {/* Nama Transaksi */}
                   <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
+                    <label htmlFor="transaction-nama" className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
                       Nama Transaksi
                     </label>
                     <input
+                      id="transaction-nama"
                       type="text"
                       value={nama}
                       onChange={(e) => setNama(e.target.value)}
@@ -232,11 +234,12 @@ export default function TransactionModal() {
                   {/* Tanggal & Akun */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
+                      <label htmlFor="transaction-tanggal" className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
                         Tanggal
                       </label>
                       <div className="relative">
                         <input
+                          id="transaction-tanggal"
                           type="date"
                           value={date}
                           onChange={(e) => setDate(e.target.value)}
@@ -245,11 +248,12 @@ export default function TransactionModal() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
+                      <label htmlFor="transaction-akun" className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
                         Akun / Dompet
                       </label>
                       <div className="relative">
                         <select 
+                          id="transaction-akun"
                           value={selectedAccount}
                           onChange={(e) => setSelectedAccount(e.target.value)}
                           className="w-full bg-[var(--color-surface-low)] border-transparent focus:border-[var(--color-primary)] focus:ring-0 rounded-lg py-3 px-4 text-base text-[var(--color-on-surface)] transition-colors appearance-none"
@@ -267,10 +271,11 @@ export default function TransactionModal() {
 
                   {/* Catatan */}
                   <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
+                    <label htmlFor="transaction-catatan" className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-1">
                       Catatan (Opsional)
                     </label>
                     <textarea
+                      id="transaction-catatan"
                       value={catatan}
                       onChange={(e) => setCatatan(e.target.value)}
                       className="w-full bg-[var(--color-surface-low)] border-transparent focus:border-[var(--color-primary)] focus:ring-0 rounded-lg py-3 px-4 text-base text-[var(--color-on-surface)] transition-colors resize-none"
