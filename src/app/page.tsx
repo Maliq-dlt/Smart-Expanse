@@ -222,7 +222,7 @@ function ScaleRevealComponent() {
 function HorizontalTestimonials() {
   const targetRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: targetRef });
-  const x = useTransform(scrollYProgress, [0, 1], ["1%", "-65%"]);
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-60%"]);
 
   const testimonials = [
     { text: "SmartExpense merubah cara saya melihat uang. UI-nya sangat memanjakan mata.", author: "Budi S.", role: "Freelancer" },
@@ -233,13 +233,13 @@ function HorizontalTestimonials() {
   ];
 
   return (
-    <section ref={targetRef} className="relative h-[300vh] bg-[var(--color-surface-lowest)]">
+    <section ref={targetRef} className="relative h-[250vh] bg-[var(--color-surface-lowest)]">
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        <div className="absolute top-24 left-6 md:left-[10%] z-10 pointer-events-none">
-          <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-surface)] drop-shadow-lg">Apa Kata Mereka.</h2>
-          <p className="text-[var(--color-outline)] mt-2 text-lg">Kisah sukses dari pengguna setia kami.</p>
+        <div className="absolute top-24 md:top-32 left-6 md:left-[10%] z-10 pointer-events-none md:w-1/3">
+          <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-surface)] drop-shadow-2xl">Apa Kata Mereka.</h2>
+          <p className="text-[var(--color-outline)] mt-4 text-lg">Kisah sukses dari pengguna setia kami.</p>
         </div>
-        <motion.div style={{ x }} className="flex gap-8 pl-[100vw] pr-[20vw] mt-20">
+        <motion.div style={{ x }} className="flex gap-6 md:gap-8 pl-[10vw] md:pl-[45vw] pr-[5vw] mt-24 md:mt-0">
           {testimonials.map((t, i) => (
             <div key={i} className="w-[350px] md:w-[450px] h-[300px] shrink-0 bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] p-8 rounded-3xl flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500">
               <span className="material-symbols-outlined text-[var(--color-primary-container)] text-5xl mb-4 opacity-50">format_quote</span>
@@ -443,13 +443,7 @@ export default function LandingPage() {
                 <motion.span variants={fadeUp} className="inline-block">Uangmu</motion.span>
               </div>
               <div className="overflow-hidden">
-                <motion.span 
-                  variants={fadeUp} 
-                  className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-tertiary)] to-[var(--color-primary)] italic pr-4"
-                  style={{ backgroundSize: "200% auto" }}
-                  animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-                >
+                <motion.span variants={fadeUp} className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-tertiary)] italic pr-4">
                   Kemana?
                 </motion.span>
               </div>
