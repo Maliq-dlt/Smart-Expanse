@@ -65,6 +65,16 @@ export default function LandingPage() {
     { title: "Wujudkan Mimpi", subtitle: "Visualisasi tabungan masa depan.", icon: "flight_takeoff" }
   ];
 
+  // --- Theme Preview & FAQ State ---
+  const [previewTheme, setPreviewTheme] = useState<'dark' | 'light'>('dark');
+  const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
+
+  const faqs = [
+    { q: "Apakah data finansial saya aman?", a: "Ya, kami tidak menyimpan kredensial bank Anda. Semua data diamankan dengan enkripsi standar industri." },
+    { q: "Apakah aplikasi ini gratis?", a: "Fitur dasar pencatatan selamanya gratis. Kami tidak akan pernah mengunci data Anda." },
+    { q: "Apakah bisa disambungkan ke rekening bank?", a: "Saat ini SmartExpense fokus pada pencatatan manual untuk memberikan Anda kontrol dan kesadaran penuh atas setiap sen yang keluar." }
+  ];
+
   return (
     <div className="bg-[var(--color-background)] text-[var(--color-on-background)] min-h-screen overflow-x-hidden selection:bg-[var(--color-primary)] selection:text-white">
       
@@ -104,15 +114,23 @@ export default function LandingPage() {
               <span className="text-xs font-semibold tracking-wider uppercase text-[var(--color-outline)]">Versi 2.0 Telah Hadir</span>
             </motion.div>
             
-            <motion.h1 variants={fadeUp} className="text-[64px] lg:text-[80px] leading-[1.05] text-[var(--color-on-background)] font-serif tracking-tight">
-              Uangmu <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-tertiary)] italic pr-4">
-                Kemana?
-              </span>
+            <motion.h1 variants={stagger} initial="hidden" animate="show" className="text-[64px] lg:text-[80px] leading-[1.05] text-[var(--color-on-background)] font-serif tracking-tight flex flex-col">
+              <div className="overflow-hidden">
+                <motion.span variants={fadeUp} className="inline-block">Uangmu</motion.span>
+              </div>
+              <div className="overflow-hidden">
+                <motion.span variants={fadeUp} className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-tertiary)] italic pr-4">
+                  Kemana?
+                </motion.span>
+              </div>
             </motion.h1>
             
-            <motion.p variants={fadeUp} className="text-xl text-[var(--color-on-surface-variant)] max-w-md leading-relaxed">
-              Lupakan pencatatan manual yang membosankan. Mulai kelola keuangan dengan antarmuka yang indah, cepat, dan interaktif.
+            <motion.p variants={stagger} initial="hidden" animate="show" className="text-xl text-[var(--color-on-surface-variant)] max-w-md leading-relaxed flex flex-wrap">
+              {"Lupakan pencatatan manual yang membosankan. Mulai kelola keuangan dengan antarmuka yang indah, cepat, dan interaktif.".split(' ').map((word, i) => (
+                <span key={i} className="overflow-hidden inline-block mr-1.5 mb-1">
+                  <motion.span variants={fadeUp} className="inline-block">{word}</motion.span>
+                </span>
+              ))}
             </motion.p>
             
             <motion.div variants={fadeUp} className="flex items-center gap-4 pt-4">
@@ -524,6 +542,100 @@ export default function LandingPage() {
                 </motion.div>
               </AnimatePresence>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- 4.5. THEME & FAQ SECTION --- */}
+      <section className="py-32 px-6 max-w-4xl mx-auto border-t border-[var(--color-surface-variant)]/30">
+        
+        {/* Interactive Theme Preview */}
+        <div className="mb-40">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-serif text-[var(--color-on-background)] mb-4 tracking-tight">Terang atau Gelap.</h2>
+            <p className="text-[var(--color-on-surface-variant)] text-lg">Dirancang untuk beradaptasi dengan kenyamanan mata Anda.</p>
+          </motion.div>
+
+          <div className="relative w-full aspect-video md:aspect-[21/9] rounded-3xl overflow-hidden shadow-2xl border border-[var(--color-surface-variant)] cursor-pointer group" onClick={() => setPreviewTheme(prev => prev === 'dark' ? 'light' : 'dark')}>
+            {/* Dark Mode Mockup (Base) */}
+            <div className="absolute inset-0 bg-[#121212] p-8 flex flex-col items-center justify-center transition-all">
+              <div className="w-full max-w-sm space-y-4">
+                <div className="w-full h-12 bg-[#1e1e1e] rounded-xl border border-white/5" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-24 bg-[#1e1e1e] rounded-xl border border-white/5" />
+                  <div className="h-24 bg-[#1e1e1e] rounded-xl border border-white/5" />
+                </div>
+              </div>
+            </div>
+
+            {/* Light Mode Mockup (Overlay with clip-path transition) */}
+            <motion.div 
+              className="absolute inset-0 bg-[#ffffff] p-8 flex flex-col items-center justify-center"
+              initial={false}
+              animate={{ clipPath: previewTheme === 'light' ? 'circle(150% at 50% 50%)' : 'circle(0% at 50% 50%)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="w-full max-w-sm space-y-4">
+                <div className="w-full h-12 bg-[#f4f4f5] rounded-xl border border-black/5 shadow-sm" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-24 bg-[#f4f4f5] rounded-xl border border-black/5 shadow-sm" />
+                  <div className="h-24 bg-[#f4f4f5] rounded-xl border border-black/5 shadow-sm" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Floating Toggle Button */}
+            <div className="absolute top-4 right-4 bg-black/20 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full flex items-center gap-2 text-white/90 group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-sm">{previewTheme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+              <span className="text-xs font-medium">Ubah Tema</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Minimalist FAQ Accordion */}
+        <div>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="mb-12">
+            <h2 className="text-3xl font-serif text-[var(--color-on-background)] mb-2">Pertanyaan Umum</h2>
+            <p className="text-[var(--color-on-surface-variant)] text-sm">Masih ragu? Kami punya jawabannya.</p>
+          </motion.div>
+
+          <div className="space-y-2">
+            {faqs.map((faq, index) => (
+              <motion.div 
+                key={index}
+                initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
+                className="border-b border-[var(--color-surface-variant)]/50"
+              >
+                <button 
+                  onClick={() => setFaqOpenIndex(faqOpenIndex === index ? null : index)}
+                  className="w-full py-6 flex justify-between items-center text-left group"
+                >
+                  <span className="text-lg font-medium text-[var(--color-on-surface)] group-hover:text-[var(--color-primary)] transition-colors">{faq.q}</span>
+                  <motion.span 
+                    className="material-symbols-outlined text-[var(--color-outline)]"
+                    animate={{ rotate: faqOpenIndex === index ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    expand_more
+                  </motion.span>
+                </button>
+                <AnimatePresence>
+                  {faqOpenIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <p className="pb-6 text-[var(--color-on-surface-variant)] leading-relaxed">
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
