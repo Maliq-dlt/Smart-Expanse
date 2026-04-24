@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, PieChart, Pie, Cell } from 'recharts';
 import MagneticButton from '@/components/ui/MagneticButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
+import HoverCard from '@/components/ui/HoverCard';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -145,7 +146,7 @@ export default function HomePage() {
         variants={stagger}
       >
         {/* Total Balance */}
-        <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-transparent hover:border-[var(--color-surface-variant)] transition-all hover:-translate-y-0.5 flex flex-col justify-between">
+        <HoverCard variants={fadeUp} className="flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
             <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Total Balance</span>
             <span className="material-symbols-outlined text-[var(--color-primary-container)] bg-[var(--color-primary-container)]/10 p-1.5 rounded-full text-xl">account_balance</span>
@@ -157,10 +158,10 @@ export default function HomePage() {
               <span>Live Updated</span>
             </div>
           </div>
-        </motion.div>
+        </HoverCard>
 
         {/* Income */}
-        <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-transparent hover:border-[var(--color-surface-variant)] transition-all hover:-translate-y-0.5 flex flex-col justify-between">
+        <HoverCard variants={fadeUp} className="flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
             <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Income</span>
             <span className="material-symbols-outlined text-[var(--color-primary-container)] bg-[var(--color-primary-container)]/10 p-1.5 rounded-full text-xl">arrow_downward</span>
@@ -171,10 +172,10 @@ export default function HomePage() {
               <span>All time</span>
             </div>
           </div>
-        </motion.div>
+        </HoverCard>
 
         {/* Expenses */}
-        <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-transparent hover:border-[var(--color-surface-variant)] transition-all hover:-translate-y-0.5 flex flex-col justify-between">
+        <HoverCard variants={fadeUp} className="flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
             <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Expenses</span>
             <span className="material-symbols-outlined text-[var(--color-tertiary-container)] bg-[var(--color-tertiary-container)]/10 p-1.5 rounded-full text-xl">arrow_upward</span>
@@ -186,17 +187,17 @@ export default function HomePage() {
               <span>All time</span>
             </div>
           </div>
-        </motion.div>
+        </HoverCard>
 
         {/* Savings Goal */}
-        <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-transparent hover:border-[var(--color-surface-variant)] transition-all hover:-translate-y-0.5 flex flex-col justify-between">
+        <HoverCard variants={fadeUp} className="flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
             <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Savings Goal</span>
             <span className="material-symbols-outlined text-[var(--color-secondary-container)] bg-[var(--color-secondary-container)]/10 p-1.5 rounded-full text-xl">savings</span>
           </div>
           <div>
             <h3 className="text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1">{savingsProgress}%</h3>
-            <div className="w-full bg-[var(--color-surface-high)] rounded-full h-2 mt-2 overflow-hidden">
+            <div className="w-full bg-[var(--color-surface-high)] rounded-full h-2 mt-2 overflow-hidden relative z-20">
               <motion.div
                 className="bg-[var(--color-primary-container)] h-full rounded-full"
                 initial={{ width: 0 }}
@@ -205,7 +206,7 @@ export default function HomePage() {
               />
             </div>
           </div>
-        </motion.div>
+        </HoverCard>
       </motion.section>
 
       {/* Charts Row */}
