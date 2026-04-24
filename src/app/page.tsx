@@ -225,7 +225,7 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
           
-          {/* Bento 1: Donut Chart (Span 2) */}
+          {/* Bento 1: Donut Chart with Category Labels */}
           <motion.div 
             className="md:col-span-2 bg-[var(--color-surface-lowest)] rounded-3xl p-8 border border-[var(--color-surface-variant)]/50 shadow-soft relative overflow-hidden group"
             initial={{ opacity: 0, y: 20 }}
@@ -244,10 +244,21 @@ export default function LandingPage() {
                   <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--color-tertiary-container)" strokeWidth="20" strokeDasharray="50 251.2" strokeDashoffset="-190" strokeLinecap="round" />
                   <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--color-secondary-container)" strokeWidth="20" strokeDasharray="15 251.2" strokeDashoffset="-245" strokeLinecap="round" />
                 </svg>
-                {/* Center text appears on hover */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-xs text-[var(--color-outline)] uppercase tracking-wider font-semibold">Total</span>
                   <span className="text-lg font-mono font-bold text-[var(--color-on-surface)]">Rp 4.2M</span>
+                </div>
+                <div className="absolute -right-6 top-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-2 group-hover:translate-x-0">
+                  <div className="w-3 h-3 rounded-full bg-[var(--color-primary-container)]" />
+                  <span className="text-xs font-medium text-[var(--color-on-surface)] whitespace-nowrap">Makan 45%</span>
+                </div>
+                <div className="absolute -left-8 bottom-12 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 -translate-x-2 group-hover:translate-x-0">
+                  <div className="w-3 h-3 rounded-full bg-[var(--color-tertiary-container)]" />
+                  <span className="text-xs font-medium text-[var(--color-on-surface)] whitespace-nowrap">Transport 20%</span>
+                </div>
+                <div className="absolute -right-2 bottom-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-200 translate-x-2 group-hover:translate-x-0">
+                  <div className="w-3 h-3 rounded-full bg-[var(--color-secondary-container)]" />
+                  <span className="text-xs font-medium text-[var(--color-on-surface)] whitespace-nowrap">Hiburan 6%</span>
                 </div>
               </motion.div>
             </div>
@@ -255,24 +266,37 @@ export default function LandingPage() {
 
           {/* Bento 2: Budget Alert */}
           <motion.div 
-            className="bg-[var(--color-surface-lowest)] rounded-3xl p-8 border border-[var(--color-surface-variant)]/50 shadow-soft relative overflow-hidden flex flex-col justify-end"
+            className="bg-[var(--color-surface-lowest)] rounded-3xl p-8 border border-[var(--color-surface-variant)]/50 shadow-soft relative overflow-hidden flex flex-col justify-between"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
           >
-            <h3 className="text-xl font-medium text-[var(--color-on-surface)] absolute top-8 left-8">Peringatan Pintar</h3>
-            <div className="w-full">
+            <h3 className="text-xl font-medium text-[var(--color-on-surface)]">Peringatan Pintar</h3>
+            <div className="w-full space-y-3">
               <motion.div 
-                className="bg-rose-100 border border-rose-200 p-4 rounded-2xl shadow-lg relative z-10"
-                animate={{ y: [20, 0, 0, 20] }}
-                transition={{ duration: 4, repeat: Infinity, times: [0, 0.2, 0.8, 1] }}
+                className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 p-4 rounded-2xl"
+                animate={{ opacity: [0, 1, 1, 0], y: [12, 0, 0, -12] }}
+                transition={{ duration: 6, repeat: Infinity, times: [0, 0.1, 0.45, 0.55] }}
               >
                 <div className="flex gap-3 items-start">
-                  <span className="material-symbols-outlined text-rose-500">warning</span>
+                  <span className="material-symbols-outlined text-rose-500 text-lg">warning</span>
                   <div>
-                    <div className="text-sm font-bold text-rose-700">Anggaran Menipis!</div>
-                    <div className="text-xs text-rose-600 mt-1">Sisa budget "Hiburan" Rp 50.000</div>
+                    <div className="text-sm font-bold text-rose-700 dark:text-rose-400">Anggaran Menipis!</div>
+                    <div className="text-xs text-rose-600 dark:text-rose-300/70 mt-0.5">Sisa budget &quot;Hiburan&quot; Rp 50.000</div>
+                  </div>
+                </div>
+              </motion.div>
+              <motion.div 
+                className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-4 rounded-2xl"
+                animate={{ opacity: [0, 0, 1, 1, 0], y: [12, 12, 0, 0, -12] }}
+                transition={{ duration: 6, repeat: Infinity, times: [0, 0.5, 0.6, 0.95, 1] }}
+              >
+                <div className="flex gap-3 items-start">
+                  <span className="material-symbols-outlined text-emerald-500 text-lg">check_circle</span>
+                  <div>
+                    <div className="text-sm font-bold text-emerald-700 dark:text-emerald-400">Target Tercapai! 🎉</div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-300/70 mt-0.5">Tabungan &quot;Liburan&quot; sudah 100%</div>
                   </div>
                 </div>
               </motion.div>
@@ -292,29 +316,36 @@ export default function LandingPage() {
               <p className="text-[var(--color-on-surface-variant)] text-sm">Tap, simpan, dan biarkan kami mengatur sisanya. Daftar transaksi yang selalu rapi.</p>
             </div>
             
-            <div className="w-full md:w-2/3 flex flex-col gap-3 relative">
-              {/* Fade masks */}
+            <div className="w-full md:w-2/3 flex flex-col gap-3 relative overflow-hidden" style={{ maxHeight: 220 }}>
               <div className="absolute top-0 w-full h-8 bg-gradient-to-b from-[var(--color-surface-lowest)] to-transparent z-10" />
               <div className="absolute bottom-0 w-full h-8 bg-gradient-to-t from-[var(--color-surface-lowest)] to-transparent z-10" />
               
               <motion.div 
                 className="flex flex-col gap-3"
-                animate={{ y: [0, -70] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                animate={{ y: [0, -320] }}
+                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
               >
-                {/* Simulated rows */}
-                {[1, 2, 3, 4].map((i) => (
+                {[
+                  { icon: 'restaurant', name: 'Ngopi Pagi', cat: 'Makan', amount: '- Rp 35.000', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-500/10' },
+                  { icon: 'directions_car', name: 'Grab ke Kantor', cat: 'Transport', amount: '- Rp 28.000', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10' },
+                  { icon: 'payments', name: 'Gaji Bulanan', cat: 'Pemasukan', amount: '+ Rp 8.500.000', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
+                  { icon: 'shopping_bag', name: 'Belanja Mingguan', cat: 'Belanja', amount: '- Rp 450.000', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
+                  { icon: 'movie', name: 'Nonton Film', cat: 'Hiburan', amount: '- Rp 150.000', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-500/10' },
+                  { icon: 'bolt', name: 'Listrik', cat: 'Tagihan', amount: '- Rp 320.000', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-500/10' },
+                  { icon: 'restaurant', name: 'Ngopi Pagi', cat: 'Makan', amount: '- Rp 35.000', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-500/10' },
+                  { icon: 'directions_car', name: 'Grab ke Kantor', cat: 'Transport', amount: '- Rp 28.000', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10' },
+                ].map((tx, i) => (
                   <div key={i} className="flex items-center justify-between bg-[var(--color-surface-low)] p-4 rounded-2xl border border-[var(--color-surface-variant)]/50">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-[var(--color-primary-container)]/20 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[var(--color-primary)] text-sm">restaurant</span>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full ${tx.bg} flex items-center justify-center`}>
+                        <span className={`material-symbols-outlined ${tx.color} text-lg`}>{tx.icon}</span>
                       </div>
                       <div>
-                        <div className="w-24 h-3 bg-[var(--color-surface-variant)] rounded-full mb-2" />
-                        <div className="w-16 h-2 bg-[var(--color-outline-variant)]/50 rounded-full" />
+                        <span className="text-sm font-medium text-[var(--color-on-surface)] block">{tx.name}</span>
+                        <span className="text-[11px] text-[var(--color-outline)]">{tx.cat}</span>
                       </div>
                     </div>
-                    <div className="w-20 h-4 bg-rose-200/50 rounded-full" />
+                    <span className={`text-sm font-mono font-bold ${tx.color}`}>{tx.amount}</span>
                   </div>
                 ))}
               </motion.div>
@@ -384,20 +415,32 @@ export default function LandingPage() {
                     <div className="space-y-4">
                       <div className="flex justify-between items-center mb-6 border-b border-[var(--color-surface-variant)] pb-4">
                         <span className="font-serif font-bold text-xl">Transaksi Baru</span>
-                        <span className="material-symbols-outlined text-emerald-500">check_circle</span>
+                        <motion.span 
+                          className="material-symbols-outlined text-emerald-500"
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        >check_circle</motion.span>
                       </div>
                       <div className="w-full h-16 bg-[var(--color-surface-low)] rounded-xl flex items-center px-4 justify-between">
                         <span className="text-[var(--color-outline)] text-2xl font-mono">Rp</span>
                         <span className="text-3xl font-mono text-[var(--color-on-surface)]">150.000</span>
                       </div>
                       <div className="grid grid-cols-4 gap-2 pt-4">
-                        {[1, 2, 3, 4].map(i => (
-                          <div key={i} className="aspect-square bg-[var(--color-surface-container)] rounded-xl flex items-center justify-center">
-                            <span className="material-symbols-outlined text-[var(--color-outline)]">fastfood</span>
+                        {[
+                          { icon: 'restaurant', label: 'Makan' },
+                          { icon: 'directions_car', label: 'Transport' },
+                          { icon: 'shopping_bag', label: 'Belanja' },
+                          { icon: 'movie', label: 'Hiburan' },
+                        ].map((cat, i) => (
+                          <div key={i} className={`aspect-square rounded-xl flex flex-col items-center justify-center gap-1 cursor-default transition-colors ${i === 0 ? 'bg-[var(--color-primary-container)]/30 border border-[var(--color-primary)]/30' : 'bg-[var(--color-surface-container)]'}`}>
+                            <span className={`material-symbols-outlined text-lg ${i === 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-outline)]'}`}>{cat.icon}</span>
+                            <span className={`text-[10px] font-medium ${i === 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-outline)]'}`}>{cat.label}</span>
                           </div>
                         ))}
                       </div>
-                      <div className="w-full h-12 bg-[var(--color-primary-container)] rounded-xl mt-6" />
+                      <div className="w-full h-12 bg-[var(--color-primary-container)] rounded-xl mt-6 flex items-center justify-center">
+                        <span className="text-sm font-semibold text-[var(--color-on-primary-container)]">Simpan Transaksi</span>
+                      </div>
                     </div>
                   )}
 
@@ -413,20 +456,41 @@ export default function LandingPage() {
                           <span className="text-emerald-600 font-mono">40%</span>
                         </div>
                         <div className="w-full h-3 bg-[var(--color-surface-container)] rounded-full overflow-hidden">
-                          <div className="w-[40%] h-full bg-emerald-500 rounded-full" />
+                          <motion.div 
+                            className="h-full bg-emerald-500 rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: '40%' }}
+                            transition={{ duration: 1, ease: 'easeOut' }}
+                          />
                         </div>
                       </div>
 
-                      <div className="space-y-2 pt-4">
+                      <div className="space-y-2 pt-2">
                         <div className="flex justify-between text-sm">
                           <span className="font-medium text-[var(--color-on-surface)]">Transportasi</span>
                           <span className="text-rose-600 font-mono">92%</span>
                         </div>
                         <div className="w-full h-3 bg-[var(--color-surface-container)] rounded-full overflow-hidden">
                           <motion.div 
-                            className="w-[92%] h-full bg-rose-500 rounded-full" 
-                            animate={{ opacity: [1, 0.5, 1] }} 
-                            transition={{ duration: 1, repeat: Infinity }}
+                            className="h-full bg-rose-500 rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: '92%' }}
+                            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 pt-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="font-medium text-[var(--color-on-surface)]">Hiburan</span>
+                          <span className="text-amber-600 font-mono">65%</span>
+                        </div>
+                        <div className="w-full h-3 bg-[var(--color-surface-container)] rounded-full overflow-hidden">
+                          <motion.div 
+                            className="h-full bg-amber-500 rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: '65%' }}
+                            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
                           />
                         </div>
                       </div>
@@ -438,7 +502,13 @@ export default function LandingPage() {
                       <div className="relative w-48 h-48 mb-6">
                         <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                           <circle cx="50" cy="50" r="45" fill="transparent" stroke="var(--color-surface-container)" strokeWidth="6" />
-                          <circle cx="50" cy="50" r="45" fill="transparent" stroke="var(--color-primary)" strokeWidth="6" strokeDasharray="282.6" strokeDashoffset="56.5" strokeLinecap="round" />
+                          <motion.circle 
+                            cx="50" cy="50" r="45" fill="transparent" stroke="var(--color-primary)" strokeWidth="6" 
+                            strokeDasharray="282.6" strokeLinecap="round"
+                            initial={{ strokeDashoffset: 282.6 }}
+                            animate={{ strokeDashoffset: 56.5 }}
+                            transition={{ duration: 1.5, ease: 'easeOut' }}
+                          />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                           <span className="material-symbols-outlined text-4xl text-[var(--color-primary)] mb-1">flight</span>
