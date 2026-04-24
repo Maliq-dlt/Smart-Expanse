@@ -446,31 +446,31 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
           >
-            <h3 className="text-xl font-medium text-[var(--color-on-surface)]">Peringatan Pintar</h3>
-            <div className="w-full space-y-3">
+            <h3 className="text-xl font-medium text-[var(--color-on-surface)] mb-4">Peringatan Pintar</h3>
+            <div className="w-full space-y-3 relative h-32">
               <motion.div 
-                className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 p-4 rounded-2xl"
+                className="absolute inset-0 bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl"
                 animate={{ opacity: [0, 1, 1, 0], y: [12, 0, 0, -12] }}
                 transition={{ duration: 6, repeat: Infinity, times: [0, 0.1, 0.45, 0.55] }}
               >
                 <div className="flex gap-3 items-start">
                   <span className="material-symbols-outlined text-rose-500 text-lg">warning</span>
                   <div>
-                    <div className="text-sm font-bold text-rose-700 dark:text-rose-400">Anggaran Menipis!</div>
-                    <div className="text-xs text-rose-600 dark:text-rose-300/70 mt-0.5">Sisa budget &quot;Hiburan&quot; Rp 50.000</div>
+                    <div className="text-sm font-bold text-rose-400">Anggaran Menipis!</div>
+                    <div className="text-xs text-rose-300/70 mt-0.5">Sisa budget &quot;Hiburan&quot; Rp 50.000</div>
                   </div>
                 </div>
               </motion.div>
               <motion.div 
-                className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-4 rounded-2xl"
+                className="absolute inset-0 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl"
                 animate={{ opacity: [0, 0, 1, 1, 0], y: [12, 12, 0, 0, -12] }}
                 transition={{ duration: 6, repeat: Infinity, times: [0, 0.5, 0.6, 0.95, 1] }}
               >
                 <div className="flex gap-3 items-start">
                   <span className="material-symbols-outlined text-emerald-500 text-lg">check_circle</span>
                   <div>
-                    <div className="text-sm font-bold text-emerald-700 dark:text-emerald-400">Target Tercapai! 🎉</div>
-                    <div className="text-xs text-emerald-600 dark:text-emerald-300/70 mt-0.5">Tabungan &quot;Liburan&quot; sudah 100%</div>
+                    <div className="text-sm font-bold text-emerald-400">Target Tercapai! 🎉</div>
+                    <div className="text-xs text-emerald-300/70 mt-0.5">Tabungan &quot;Liburan&quot; sudah 100%</div>
                   </div>
                 </div>
               </motion.div>
@@ -479,40 +479,42 @@ export default function LandingPage() {
 
           {/* Bento 3: Transaction List (Span 3) */}
           <SpotlightCard 
-            className="md:col-span-3 bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col md:flex-row gap-8 items-center"
+            className="md:col-span-3 bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col md:flex-row gap-12 items-start"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            <div className="w-full md:w-1/3 z-10">
-              <h3 className="text-2xl font-medium text-[var(--color-on-surface)] mb-2">Riwayat Otomatis</h3>
-              <p className="text-[var(--color-on-surface-variant)] text-sm">Tap, simpan, dan biarkan kami mengatur sisanya. Daftar transaksi yang selalu rapi.</p>
+            <div className="w-full md:w-1/3 z-10 sticky top-0">
+              <h3 className="text-2xl font-medium text-[var(--color-on-surface)] mb-4">Riwayat Otomatis</h3>
+              <p className="text-[var(--color-on-surface-variant)] text-base leading-relaxed">
+                Tap, simpan, dan biarkan kami mengatur sisanya. Daftar transaksi yang selalu rapi tanpa warna yang mencolok.
+              </p>
             </div>
             
-            <div className="w-full md:w-2/3 flex flex-col gap-3 relative overflow-hidden" style={{ maxHeight: 220 }}>
-              <div className="absolute top-0 w-full h-8 bg-gradient-to-b from-[var(--color-surface-lowest)] to-transparent z-10" />
-              <div className="absolute bottom-0 w-full h-8 bg-gradient-to-t from-[var(--color-surface-lowest)] to-transparent z-10" />
+            <div className="w-full md:w-2/3 flex flex-col gap-3 relative overflow-hidden h-[240px]">
+              <div className="absolute top-0 w-full h-12 bg-gradient-to-b from-[var(--color-surface-lowest)] to-transparent z-10 pointer-events-none" />
+              <div className="absolute bottom-0 w-full h-12 bg-gradient-to-t from-[var(--color-surface-lowest)] to-transparent z-10 pointer-events-none" />
               
               <motion.div 
                 className="flex flex-col gap-3"
-                animate={{ y: [0, -320] }}
-                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                animate={{ y: [0, -380] }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
               >
                 {[
-                  { icon: 'restaurant', name: 'Ngopi Pagi', cat: 'Makan', amount: '- Rp 35.000', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-500/10' },
-                  { icon: 'directions_car', name: 'Grab ke Kantor', cat: 'Transport', amount: '- Rp 28.000', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10' },
-                  { icon: 'payments', name: 'Gaji Bulanan', cat: 'Pemasukan', amount: '+ Rp 8.500.000', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
-                  { icon: 'shopping_bag', name: 'Belanja Mingguan', cat: 'Belanja', amount: '- Rp 450.000', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-500/10' },
-                  { icon: 'movie', name: 'Nonton Film', cat: 'Hiburan', amount: '- Rp 150.000', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-500/10' },
-                  { icon: 'bolt', name: 'Listrik', cat: 'Tagihan', amount: '- Rp 320.000', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-500/10' },
-                  { icon: 'restaurant', name: 'Ngopi Pagi', cat: 'Makan', amount: '- Rp 35.000', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-500/10' },
-                  { icon: 'directions_car', name: 'Grab ke Kantor', cat: 'Transport', amount: '- Rp 28.000', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10' },
+                  { icon: 'restaurant', name: 'Ngopi Pagi', cat: 'Makan', amount: '- Rp 35.000', color: 'text-[var(--color-on-surface)]', iconColor: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-container)]' },
+                  { icon: 'directions_car', name: 'Grab ke Kantor', cat: 'Transport', amount: '- Rp 28.000', color: 'text-[var(--color-on-surface)]', iconColor: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-container)]' },
+                  { icon: 'payments', name: 'Gaji Bulanan', cat: 'Pemasukan', amount: '+ Rp 8.500.000', color: 'text-emerald-500', iconColor: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                  { icon: 'shopping_bag', name: 'Belanja Mingguan', cat: 'Belanja', amount: '- Rp 450.000', color: 'text-[var(--color-on-surface)]', iconColor: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-container)]' },
+                  { icon: 'movie', name: 'Nonton Film', cat: 'Hiburan', amount: '- Rp 150.000', color: 'text-[var(--color-on-surface)]', iconColor: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-container)]' },
+                  { icon: 'bolt', name: 'Listrik', cat: 'Tagihan', amount: '- Rp 320.000', color: 'text-[var(--color-on-surface)]', iconColor: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-container)]' },
+                  { icon: 'restaurant', name: 'Ngopi Pagi', cat: 'Makan', amount: '- Rp 35.000', color: 'text-[var(--color-on-surface)]', iconColor: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-container)]' },
+                  { icon: 'directions_car', name: 'Grab ke Kantor', cat: 'Transport', amount: '- Rp 28.000', color: 'text-[var(--color-on-surface)]', iconColor: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-container)]' },
                 ].map((tx, i) => (
                   <div key={i} className="flex items-center justify-between bg-[var(--color-surface-low)] p-4 rounded-2xl border border-[var(--color-surface-variant)]/50">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-full ${tx.bg} flex items-center justify-center`}>
-                        <span className={`material-symbols-outlined ${tx.color} text-lg`}>{tx.icon}</span>
+                        <span className={`material-symbols-outlined ${tx.iconColor} text-lg`}>{tx.icon}</span>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-[var(--color-on-surface)] block">{tx.name}</span>
