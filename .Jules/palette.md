@@ -1,0 +1,3 @@
+## 2026-04-24 - Explicit Label Bindings in Custom Modals
+**Learning:** In complex custom UI like modals containing form elements, implicit associations (like placing an `<input>` after a `<label>` without an `id` or nesting it improperly) often fails screen reader accessibility and prevents users from focusing inputs by clicking the label text. Explicitly binding them via `htmlFor` and `id` drastically improves the interactive experience and accessibility, especially with custom-styled elements.
+**Action:** When creating new form fields inside custom modals, always explicitly use `htmlFor` on the `<label>` that matches the `id` attribute of the associated input/select/textarea.
