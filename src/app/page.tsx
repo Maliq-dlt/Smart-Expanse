@@ -85,6 +85,100 @@ function CountUpNumber({ value, prefix = "", suffix = "" }: { value: number, pre
   return <span ref={ref}>{prefix}0{suffix}</span>;
 }
 
+function SpotlightCard({ children, className = "", ...props }: any) {
+  const divRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <motion.div
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setOpacity(1)}
+      onMouseLeave={() => setOpacity(0)}
+      className={`relative overflow-hidden rounded-3xl border border-[var(--color-surface-variant)]/50 ${className}`}
+      {...props}
+    >
+      <div
+        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 z-0"
+        style={{
+          opacity,
+          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(16, 185, 129, 0.1), transparent 40%)`, // Using a subtle emerald glow
+        }}
+      />
+      <div className="relative z-10 h-full">{children}</div>
+    </motion.div>
+  );
+}
+
+function ScrollRevealText({ text }: { text: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 80%", "end 50%"]
+  });
+
+  const words = text.split(" ");
+  return (
+    <div ref={ref} className="flex flex-wrap justify-center gap-x-3 gap-y-1 max-w-4xl mx-auto px-6 py-32">
+      {words.map((word, i) => {
+        const start = i / words.length;
+        const end = start + (1 / words.length);
+        // We use React.createElement to avoid issues with hook inside map if any, but mapping over array is fine if array length is constant.
+        // Even better, just call useTransform directly since words length is static.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const opacity = useTransform(scrollYProgress, [start, end], [0.15, 1]);
+        return (
+          <motion.span key={i} style={{ opacity }} className="text-4xl md:text-6xl font-serif text-[var(--color-on-background)] text-center leading-tight">
+            {word}
+          </motion.span>
+        );
+      })}
+    </div>
+  );
+}
+
+function ScaleRevealComponent() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "center center"]
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
+  const borderRadius = useTransform(scrollYProgress, [0, 1], ["48px", "0px"]);
+
+  return (
+    <section ref={ref} className="py-24 px-4 md:px-8 bg-[var(--color-background)] overflow-hidden">
+      <motion.div 
+        style={{ scale, borderRadius }}
+        className="w-full aspect-video md:aspect-[21/9] bg-[var(--color-surface-lowest)] border border-[var(--color-surface-variant)]/50 shadow-2xl relative overflow-hidden mx-auto max-w-[1400px] flex items-center justify-center group"
+      >
+        <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-primary)]/10 via-transparent to-[var(--color-tertiary)]/10" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+        
+        <div className="text-center z-10 p-8 max-w-3xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-background)] mb-6 tracking-tight">Ketenangan Pikiran.</h2>
+            <p className="text-[var(--color-on-surface-variant)] text-xl">Dibungkus dalam desain yang mulus, sistem kami bekerja tanpa lelah menjaga arus kas Anda tetap sehat.</p>
+          </motion.div>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
 export default function LandingPage() {
   const { isAuthenticated } = useAuthStore();
   // --- Hero Parallax State ---
@@ -291,6 +385,11 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* --- AWWWARDS: SCROLL REVEAL TEXT --- */}
+      <section className="bg-[var(--color-background)] border-b border-[var(--color-surface-variant)]/30">
+        <ScrollRevealText text="Kebebasan finansial dimulai dari satu langkah kecil. Lacak, kelola, dan raih impian Anda." />
+      </section>
+
       {/* --- 3. VISUAL BENTO BOX --- */}
       <section id="bento" className="py-24 px-6 max-w-7xl mx-auto">
         <motion.div className="text-center mb-16" initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}>
@@ -301,8 +400,8 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
           
           {/* Bento 1: Donut Chart with Category Labels */}
-          <motion.div 
-            className="md:col-span-2 bg-[var(--color-surface-lowest)] rounded-3xl p-8 border border-[var(--color-surface-variant)]/50 shadow-soft relative overflow-hidden group"
+          <SpotlightCard 
+            className="md:col-span-2 bg-[var(--color-surface-lowest)] p-8 shadow-soft group"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -337,11 +436,11 @@ export default function LandingPage() {
                 </div>
               </motion.div>
             </div>
-          </motion.div>
+          </SpotlightCard>
 
           {/* Bento 2: Budget Alert */}
-          <motion.div 
-            className="bg-[var(--color-surface-lowest)] rounded-3xl p-8 border border-[var(--color-surface-variant)]/50 shadow-soft relative overflow-hidden flex flex-col justify-between"
+          <SpotlightCard 
+            className="bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col justify-between"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -376,11 +475,11 @@ export default function LandingPage() {
                 </div>
               </motion.div>
             </div>
-          </motion.div>
+          </SpotlightCard>
 
           {/* Bento 3: Transaction List (Span 3) */}
-          <motion.div 
-            className="md:col-span-3 bg-[var(--color-surface-lowest)] rounded-3xl p-8 border border-[var(--color-surface-variant)]/50 shadow-soft relative overflow-hidden flex flex-col md:flex-row gap-8 items-center"
+          <SpotlightCard 
+            className="md:col-span-3 bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col md:flex-row gap-8 items-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -425,10 +524,13 @@ export default function LandingPage() {
                 ))}
               </motion.div>
             </div>
-          </motion.div>
+          </SpotlightCard>
 
         </div>
       </section>
+
+      {/* --- AWWWARDS: SCALE REVEAL SECTION --- */}
+      <ScaleRevealComponent />
 
       {/* --- 4. INTERACTIVE FEATURE TABS --- */}
       <section id="tabs" className="py-24 px-6 bg-[var(--color-surface-lowest)] border-y border-[var(--color-surface-variant)]">
