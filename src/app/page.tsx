@@ -1,9 +1,10 @@
 'use client';
 
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, Variants, useInView, animate } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, useMotionValueEvent, Variants, useInView, animate } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
+import Lenis from 'lenis';
 
 // --- Shared Animations ---
 const fadeUp: Variants = {
@@ -223,7 +224,75 @@ export default function LandingPage() {
     { q: "Apakah bisa disambungkan ke rekening bank?", a: "Saat ini SmartExpense fokus pada pencatatan manual untuk memberikan Anda kontrol dan kesadaran penuh atas setiap sen yang keluar." }
   ];
 
+  // --- Preloader State ---
+  const [isLoading, setIsLoading] = useState(true);
+
+  // --- Lenis Smooth Scroll ---
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    return () => lenis.destroy();
+  }, []);
+
+  // --- Scroll Progress ---
+  const { scrollYProgress: pageScrollProgress } = useScroll();
+  const scaleX = useSpring(pageScrollProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  // --- Preloader timer ---
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1800);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
+    <>
+      {/* --- PAGE PRELOADER --- */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            className="fixed inset-0 z-[100] bg-[#0a0a0a] flex items-center justify-center"
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="text-center"
+            >
+              <h1 className="text-5xl md:text-7xl font-serif italic font-bold text-white/90 tracking-tight">SmartExpense.</h1>
+              <motion.div 
+                className="mt-8 mx-auto h-[2px] bg-white/20 w-48 rounded-full overflow-hidden"
+              >
+                <motion.div 
+                  className="h-full bg-white/80 rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- SCROLL PROGRESS BAR --- */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[2px] bg-[var(--color-primary)] z-[60] origin-left"
+        style={{ scaleX }}
+      />
+
     <div className="bg-[var(--color-background)] text-[var(--color-on-background)] min-h-screen overflow-x-hidden selection:bg-[var(--color-primary)] selection:text-white">
       
       {/* --- Navigation --- */}
@@ -899,5 +968,6 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
