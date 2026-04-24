@@ -8,6 +8,7 @@ import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, PieChart, Pie, Ce
 import MagneticButton from '@/components/ui/MagneticButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
 import HoverCard from '@/components/ui/HoverCard';
+import EmptyState from '@/components/ui/EmptyState';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -53,7 +54,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function HomePage() {
   const { openTransactionModal } = useModal();
-  const { transactions, getTotalBalance, goals } = useFinanceStore();
+  const { transactions, getTotalBalance, goals, budgetCategories } = useFinanceStore();
   const user = useAuthStore((s) => s.user);
 
   // Get greeting based on Jakarta time
@@ -302,7 +303,7 @@ export default function HomePage() {
                 </div>
               </>
             ) : (
-              <p className="text-sm text-[var(--color-outline)]">Belum ada data pengeluaran.</p>
+              <EmptyState icon="pie_chart" title="Belum Ada Pengeluaran" description="Data donut chart akan muncul setelah Anda mencatat transaksi pengeluaran pertama." />
             )}
           </div>
         </motion.div>
@@ -351,7 +352,7 @@ export default function HomePage() {
               </motion.div>
             ))}
             {recentTransactions.length === 0 && (
-              <p className="text-sm text-[var(--color-outline)] p-4 text-center">Belum ada transaksi.</p>
+              <EmptyState icon="receipt_long" title="Belum Ada Transaksi" description="Mulai catat transaksi pertamamu untuk melihat riwayat keuangan di sini." actionLabel="Transaksi Baru" onAction={openTransactionModal} />
             )}
           </div>
         </motion.div>
@@ -360,62 +361,37 @@ export default function HomePage() {
         <motion.div variants={fadeUp} className="lg:col-span-5 bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <h3 className="text-2xl font-normal text-[var(--color-on-surface)] font-serif mb-6">Anggaran Bulan Ini</h3>
           <div className="space-y-6">
-            {/* Budget: Safe */}
-            <div>
-              <div className="flex justify-between items-end mb-2">
-                <div>
-                  <p className="font-medium text-[var(--color-on-surface)]">Belanja Harian</p>
-                  <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Sisa Rp 1.200.000</p>
-                </div>
-                <span className="text-sm font-normal font-mono text-[var(--color-on-surface)]">40%</span>
-              </div>
-              <div className="w-full bg-[var(--color-surface-container)] h-2 rounded-full overflow-hidden">
-                <motion.div
-                  className="bg-[var(--color-primary-container)] h-full rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: '40%' }}
-                  transition={{ duration: 0.8, ease: 'easeOut', delay: 0.6 }}
-                />
-              </div>
-            </div>
-
-            {/* Budget: Warning */}
-            <div>
-              <div className="flex justify-between items-end mb-2">
-                <div>
-                  <p className="font-medium text-[var(--color-on-surface)]">Transportasi</p>
-                  <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Sisa Rp 200.000</p>
-                </div>
-                <span className="text-sm font-normal font-mono text-[var(--color-on-surface)]">85%</span>
-              </div>
-              <div className="w-full bg-[var(--color-surface-container)] h-2 rounded-full overflow-hidden">
-                <motion.div
-                  className="bg-[var(--color-warning)] h-full rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: '85%' }}
-                  transition={{ duration: 0.8, ease: 'easeOut', delay: 0.7 }}
-                />
-              </div>
-            </div>
-
-            {/* Budget: Danger */}
-            <div>
-              <div className="flex justify-between items-end mb-2">
-                <div>
-                  <p className="font-medium text-[var(--color-on-surface)]">Hiburan</p>
-                  <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Over budget Rp 150.000</p>
-                </div>
-                <span className="text-sm font-normal font-mono text-[var(--color-error)]">110%</span>
-              </div>
-              <div className="w-full bg-[var(--color-surface-container)] h-2 rounded-full overflow-hidden">
-                <motion.div
-                  className="bg-[var(--color-error)] h-full rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: 0.8, ease: 'easeOut', delay: 0.8 }}
-                />
-              </div>
-            </div>
+            {budgetCategories.length > 0 ? (
+              budgetCategories.map((cat, idx) => {
+                const pct = cat.allocated > 0 ? Math.round((cat.spent / cat.allocated) * 100) : 0;
+                const sisa = cat.allocated - cat.spent;
+                const barColor = pct >= 100 ? 'bg-[var(--color-error)]' : pct >= 75 ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-primary-container)]';
+                const textColor = pct >= 100 ? 'text-[var(--color-error)]' : 'text-[var(--color-on-surface)]';
+                return (
+                  <div key={cat.id || idx}>
+                    <div className="flex justify-between items-end mb-2">
+                      <div>
+                        <p className="font-medium text-[var(--color-on-surface)]">{cat.name}</p>
+                        <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">
+                          {sisa >= 0 ? `Sisa Rp ${formatRupiah(sisa)}` : `Over budget Rp ${formatRupiah(Math.abs(sisa))}`}
+                        </p>
+                      </div>
+                      <span className={`text-sm font-normal font-mono ${textColor}`}>{pct}%</span>
+                    </div>
+                    <div className="w-full bg-[var(--color-surface-container)] h-2 rounded-full overflow-hidden">
+                      <motion.div
+                        className={`${barColor} h-full rounded-full`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.min(pct, 100)}%` }}
+                        transition={{ duration: 0.8, ease: 'easeOut', delay: 0.5 + idx * 0.1 }}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <EmptyState icon="account_balance_wallet" title="Belum Ada Anggaran" description="Buat kategori anggaran di menu Budget untuk memantau pengeluaran Anda." />
+            )}
           </div>
         </motion.div>
       </motion.section>
