@@ -438,63 +438,75 @@ export default function LandingPage() {
             </div>
           </SpotlightCard>
 
-          {/* Bento 2: Budget Alert */}
+          {/* Bento 2: Budget Alert - single slot animation */}
           <SpotlightCard 
-            className="bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col justify-between"
+            className="bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
           >
-            <h3 className="text-xl font-medium text-[var(--color-on-surface)] mb-4">Peringatan Pintar</h3>
-            <div className="w-full space-y-3 relative h-32">
-              <motion.div 
-                className="absolute inset-0 bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl"
-                animate={{ opacity: [0, 1, 1, 0], y: [12, 0, 0, -12] }}
-                transition={{ duration: 6, repeat: Infinity, times: [0, 0.1, 0.45, 0.55] }}
-              >
-                <div className="flex gap-3 items-start">
-                  <span className="material-symbols-outlined text-rose-500 text-lg">warning</span>
-                  <div>
-                    <div className="text-sm font-bold text-rose-400">Anggaran Menipis!</div>
-                    <div className="text-xs text-rose-300/70 mt-0.5">Sisa budget &quot;Hiburan&quot; Rp 50.000</div>
+            <h3 className="text-xl font-medium text-[var(--color-on-surface)] mb-6">Peringatan Pintar</h3>
+            <div className="flex-1 flex items-center">
+              <div className="w-full relative h-24 overflow-hidden">
+                <motion.div
+                  className="absolute inset-x-0"
+                  animate={{ y: [0, 0, -96, -96] }}
+                  transition={{ duration: 6, repeat: Infinity, times: [0, 0.45, 0.5, 1], ease: "easeInOut" }}
+                >
+                  {/* Alert 1 */}
+                  <div className="h-24 flex items-center">
+                    <div className="w-full bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl">
+                      <div className="flex gap-3 items-start">
+                        <span className="material-symbols-outlined text-rose-500 text-lg">warning</span>
+                        <div>
+                          <div className="text-sm font-bold text-rose-400">Anggaran Menipis!</div>
+                          <div className="text-xs text-rose-300/70 mt-0.5">Sisa budget &quot;Hiburan&quot; Rp 50.000</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-              <motion.div 
-                className="absolute inset-0 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl"
-                animate={{ opacity: [0, 0, 1, 1, 0], y: [12, 12, 0, 0, -12] }}
-                transition={{ duration: 6, repeat: Infinity, times: [0, 0.5, 0.6, 0.95, 1] }}
-              >
-                <div className="flex gap-3 items-start">
-                  <span className="material-symbols-outlined text-emerald-500 text-lg">check_circle</span>
-                  <div>
-                    <div className="text-sm font-bold text-emerald-400">Target Tercapai! 🎉</div>
-                    <div className="text-xs text-emerald-300/70 mt-0.5">Tabungan &quot;Liburan&quot; sudah 100%</div>
+                  {/* Alert 2 */}
+                  <div className="h-24 flex items-center">
+                    <div className="w-full bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl">
+                      <div className="flex gap-3 items-start">
+                        <span className="material-symbols-outlined text-emerald-500 text-lg">check_circle</span>
+                        <div>
+                          <div className="text-sm font-bold text-emerald-400">Target Tercapai! 🎉</div>
+                          <div className="text-xs text-emerald-300/70 mt-0.5">Tabungan &quot;Liburan&quot; sudah 100%</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </div>
           </SpotlightCard>
 
-          {/* Bento 3: Transaction List (Span 3) */}
+          {/* Bento 3: Riwayat Otomatis - text on left col, list on right 2 cols */}
           <SpotlightCard 
-            className="md:col-span-3 bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col md:flex-row gap-12 items-start"
+            className="bg-[var(--color-surface-lowest)] p-8 shadow-soft flex flex-col justify-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            <div className="w-full md:w-1/3 z-10 sticky top-0">
-              <h3 className="text-2xl font-medium text-[var(--color-on-surface)] mb-4">Riwayat Otomatis</h3>
-              <p className="text-[var(--color-on-surface-variant)] text-base leading-relaxed">
-                Tap, simpan, dan biarkan kami mengatur sisanya. Daftar transaksi yang selalu rapi tanpa warna yang mencolok.
-              </p>
-            </div>
-            
-            <div className="w-full md:w-2/3 flex flex-col gap-3 relative overflow-hidden h-[240px]">
-              <div className="absolute top-0 w-full h-12 bg-gradient-to-b from-[var(--color-surface-lowest)] to-transparent z-10 pointer-events-none" />
-              <div className="absolute bottom-0 w-full h-12 bg-gradient-to-t from-[var(--color-surface-lowest)] to-transparent z-10 pointer-events-none" />
+            <h3 className="text-2xl font-medium text-[var(--color-on-surface)] mb-4">Riwayat Otomatis</h3>
+            <p className="text-[var(--color-on-surface-variant)] text-sm leading-relaxed">
+              Tap, simpan, dan biarkan kami mengatur sisanya. Daftar transaksi yang selalu rapi.
+            </p>
+          </SpotlightCard>
+
+          <SpotlightCard 
+            className="md:col-span-2 bg-[var(--color-surface-lowest)] p-6 shadow-soft"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="w-full h-full flex flex-col gap-3 relative overflow-hidden">
+              <div className="absolute top-0 w-full h-10 bg-gradient-to-b from-[var(--color-surface-lowest)] to-transparent z-10 pointer-events-none" />
+              <div className="absolute bottom-0 w-full h-10 bg-gradient-to-t from-[var(--color-surface-lowest)] to-transparent z-10 pointer-events-none" />
               
               <motion.div 
                 className="flex flex-col gap-3"
