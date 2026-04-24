@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFinanceStore, Goal } from '@/store/useFinanceStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -37,6 +38,7 @@ function formatRupiah(amount: number) {
 
 export default function GoalsPage() {
   const { goals, addGoal, addFundsToGoal, deleteGoal } = useFinanceStore();
+  const userId = useAuthStore((s) => s.user?.userId);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [fundModalGoalId, setFundModalGoalId] = useState<string | null>(null);
@@ -59,7 +61,7 @@ export default function GoalsPage() {
 
   const handleAddGoal = () => {
     const target = parseInt(formTarget.replace(/\D/g, ''), 10);
-    if (!formName || !target || !formDeadline) return;
+    if (!formName || !target || !formDeadline || !userId) return;
 
     addGoal({
       name: formName,
@@ -68,7 +70,7 @@ export default function GoalsPage() {
       current: 0,
       deadline: formDeadline,
       color: formColor,
-    });
+    }, userId);
     setShowAddModal(false);
     resetForm();
   };

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
+import { syncUser } from '@/actions/finance';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -18,11 +19,16 @@ export default function SignupPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    // After "signup", redirect to login
-    router.push('/login');
+    try {
+      // Create user in database
+      const dbUser = await syncUser(email, name);
+      
+      signup(email, dbUser.name, dbUser.id);
+      router.push('/home');
+    } catch (error) {
+      console.error('Signup failed:', error);
+      setIsLoading(false);
+    }
   };
 
   return (

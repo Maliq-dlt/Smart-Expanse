@@ -4,13 +4,14 @@ import { persist } from 'zustand/middleware';
 export interface User {
   name: string;
   email: string;
+  userId: string; // Database UUID
 }
 
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, name: string) => void;
-  signup: (email: string, name: string) => void;
+  login: (email: string, name: string, userId: string) => void;
+  signup: (email: string, name: string, userId: string) => void;
   logout: () => void;
 }
 
@@ -20,16 +21,16 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       user: null,
 
-      login: (email, name) =>
+      login: (email, name, userId) =>
         set(() => ({
           isAuthenticated: true,
-          user: { email, name },
+          user: { email, name, userId },
         })),
 
-      signup: (email, name) =>
+      signup: (email, name, userId) =>
         set(() => ({
           isAuthenticated: true,
-          user: { email, name },
+          user: { email, name, userId },
         })),
 
       logout: () =>

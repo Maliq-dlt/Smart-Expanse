@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
+import { syncUser } from '@/actions/finance';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,18 +18,23 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      // Derive name from email
+      const rawName = email.split('@')[0].replace(/[._-]/g, ' ');
+      const displayName = rawName
+        .split(' ')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
 
-    // Derive name from email (e.g. "john.doe@email.com" → "John Doe")
-    const rawName = email.split('@')[0].replace(/[._-]/g, ' ');
-    const displayName = rawName
-      .split(' ')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
-
-    login(email, displayName);
-    router.push('/home');
+      // Sync user to database (creates if not exists)
+      const dbUser = await syncUser(email, displayName);
+      
+      login(email, dbUser.name, dbUser.id);
+      router.push('/home');
+    } catch (error) {
+      console.error('Login failed:', error);
+      setIsLoading(false);
+    }
   };
 
   return (

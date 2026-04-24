@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore, TransactionType } from '@/store/useFinanceStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 
 const categories = [
@@ -17,6 +18,7 @@ const categories = [
 export default function TransactionModal() {
   const { isTransactionModalOpen, closeTransactionModal } = useModal();
   const { addTransaction, accounts } = useFinanceStore();
+  const userId = useAuthStore((s) => s.user?.userId);
 
   const [transactionType, setTransactionType] = useState<TransactionType>('expense');
   const [selectedCategory, setSelectedCategory] = useState('food');
@@ -41,6 +43,7 @@ export default function TransactionModal() {
     if (!amount || amount <= 0) return; // Basic validation
     if (!nama) return;
 
+    if (!userId) return;
     addTransaction({
       desc: nama,
       amount: amount,
@@ -48,7 +51,7 @@ export default function TransactionModal() {
       category: categories.find(c => c.id === selectedCategory)?.label || 'Other',
       date: new Date(date).toISOString(),
       account: selectedAccount
-    });
+    }, userId);
 
     closeTransactionModal();
     toast.success('Transaksi berhasil ditambahkan!', {

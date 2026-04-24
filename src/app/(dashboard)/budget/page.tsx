@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFinanceStore, BudgetCategory } from '@/store/useFinanceStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -31,6 +32,7 @@ function formatRupiah(amount: number) {
 
 export default function BudgetPage() {
   const { budgetCategories, addBudgetCategory, updateBudgetCategory, deleteBudgetCategory } = useFinanceStore();
+  const userId = useAuthStore((s) => s.user?.userId);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -70,7 +72,8 @@ export default function BudgetPage() {
     if (editingId) {
       updateBudgetCategory(editingId, { name: formName, icon: formIcon, allocated: amount });
     } else {
-      addBudgetCategory({ name: formName, icon: formIcon, allocated: amount, spent: 0 });
+      if (!userId) return;
+      addBudgetCategory({ name: formName, icon: formIcon, allocated: amount, spent: 0 }, userId);
     }
     setShowAddModal(false);
     resetForm();
