@@ -20,6 +20,14 @@ const stagger: Variants = {
   },
 };
 
+const heroStagger: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 2.0 }, // Wait for preloader
+  },
+};
+
 // --- Mock Data for Marquee (Elegan) ---
 const marqueeItems = [
   { icon: 'local_cafe', label: 'Ngopi', amount: '- Rp 35.000', type: 'expense' },
@@ -75,7 +83,7 @@ function CountUpNumber({ value, prefix = "", suffix = "" }: { value: number, pre
         if (ref.current) {
           const formatted = prefix === "Rp " ? 
              Math.floor(val).toLocaleString('id-ID') : 
-             Math.floor(val).toString();
+             Number.isInteger(value) ? Math.floor(val).toString() : val.toFixed(1);
           ref.current.textContent = `${prefix}${formatted}${suffix}`;
         }
       }
@@ -207,6 +215,46 @@ function ScaleRevealComponent() {
           </motion.div>
         </div>
       </motion.div>
+    </section>
+  );
+}
+
+function HorizontalTestimonials() {
+  const targetRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: targetRef });
+  const x = useTransform(scrollYProgress, [0, 1], ["1%", "-65%"]);
+
+  const testimonials = [
+    { text: "SmartExpense merubah cara saya melihat uang. UI-nya sangat memanjakan mata.", author: "Budi S.", role: "Freelancer" },
+    { text: "Satu-satunya aplikasi keuangan yang membuat saya rutin mencatat setiap hari.", author: "Siti M.", role: "Mahasiswa" },
+    { text: "Desainnya sekelas aplikasi internasional. Bangga ada karya sekeren ini.", author: "Reza A.", role: "Desainer UI/UX" },
+    { text: "Tidak ada lagi pusing akhir bulan. Semua terlihat jelas dalam satu dashboard.", author: "Diana P.", role: "Ibu Rumah Tangga" },
+    { text: "Transisinya sangat smooth. Menggunakan aplikasi ini rasanya seperti bermain game.", author: "Kevin W.", role: "Software Engineer" },
+  ];
+
+  return (
+    <section ref={targetRef} className="relative h-[300vh] bg-[var(--color-surface-lowest)]">
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+        <div className="absolute top-24 left-6 md:left-[10%] z-10 pointer-events-none">
+          <h2 className="text-4xl md:text-6xl font-serif text-[var(--color-on-surface)] drop-shadow-lg">Apa Kata Mereka.</h2>
+          <p className="text-[var(--color-outline)] mt-2 text-lg">Kisah sukses dari pengguna setia kami.</p>
+        </div>
+        <motion.div style={{ x }} className="flex gap-8 pl-[100vw] pr-[20vw] mt-20">
+          {testimonials.map((t, i) => (
+            <div key={i} className="w-[350px] md:w-[450px] h-[300px] shrink-0 bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] p-8 rounded-3xl flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500">
+              <span className="material-symbols-outlined text-[var(--color-primary-container)] text-5xl mb-4 opacity-50">format_quote</span>
+              <p className="text-xl md:text-2xl font-serif text-[var(--color-on-surface)] leading-snug">"{t.text}"</p>
+              <div className="mt-8 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--color-primary)] to-[var(--color-tertiary)] flex items-center justify-center text-white font-bold text-lg shadow-inner">{t.author.charAt(0)}</div>
+                <div>
+                  <div className="font-semibold text-[var(--color-on-surface)]">{t.author}</div>
+                  <div className="text-xs text-[var(--color-outline)] uppercase tracking-wider">{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
     </section>
   );
 }
@@ -384,24 +432,30 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
           {/* Left: Text Content */}
-          <motion.div className="space-y-8 z-10" initial="hidden" animate="show" variants={stagger}>
+          <motion.div className="space-y-8 z-10" initial="hidden" animate="show" variants={heroStagger}>
             <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-surface-low)] border border-[var(--color-surface-variant)] shadow-sm">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               <span className="text-xs font-semibold tracking-wider uppercase text-[var(--color-outline)]">Versi 2.0 Telah Hadir</span>
             </motion.div>
             
-            <motion.h1 variants={stagger} initial="hidden" animate="show" className="text-[64px] lg:text-[80px] leading-[1.05] text-[var(--color-on-background)] font-serif tracking-tight flex flex-col">
+            <motion.h1 variants={heroStagger} initial="hidden" animate="show" className="text-[64px] lg:text-[80px] leading-[1.05] text-[var(--color-on-background)] font-serif tracking-tight flex flex-col">
               <div className="overflow-hidden">
                 <motion.span variants={fadeUp} className="inline-block">Uangmu</motion.span>
               </div>
               <div className="overflow-hidden">
-                <motion.span variants={fadeUp} className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-tertiary)] italic pr-4">
+                <motion.span 
+                  variants={fadeUp} 
+                  className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-tertiary)] to-[var(--color-primary)] italic pr-4"
+                  style={{ backgroundSize: "200% auto" }}
+                  animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                >
                   Kemana?
                 </motion.span>
               </div>
             </motion.h1>
             
-            <motion.p variants={stagger} initial="hidden" animate="show" className="text-xl text-[var(--color-on-surface-variant)] max-w-md leading-relaxed flex flex-wrap">
+            <motion.p variants={heroStagger} initial="hidden" animate="show" className="text-xl text-[var(--color-on-surface-variant)] max-w-md leading-relaxed flex flex-wrap">
               {"Lupakan pencatatan manual yang membosankan. Mulai kelola keuangan dengan antarmuka yang indah, cepat, dan interaktif.".split(' ').map((word, i) => (
                 <span key={i} className="overflow-hidden inline-block mr-1.5 mb-1">
                   <motion.span variants={fadeUp} className="inline-block">{word}</motion.span>
@@ -874,8 +928,22 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* --- TRUSTED BY SECTION --- */}
+      <section className="py-16 border-y border-[var(--color-surface-variant)]/30 bg-[var(--color-surface-lowest)] overflow-hidden">
+        <p className="text-center text-sm font-semibold tracking-wider text-[var(--color-outline)] uppercase mb-8">Dipercaya oleh pengguna dan diliput oleh</p>
+        <div className="flex gap-16 md:gap-32 px-6 items-center justify-center opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+          <div className="text-2xl font-bold font-serif tracking-tight">TechInAsia</div>
+          <div className="text-2xl font-bold font-serif tracking-tight">DailySocial</div>
+          <div className="text-2xl font-bold font-serif tracking-tight">Kompas</div>
+          <div className="text-2xl font-bold font-serif tracking-tight hidden md:block">Forbes</div>
+        </div>
+      </section>
+
+      {/* --- HORIZONTAL SCROLL TESTIMONIALS --- */}
+      <HorizontalTestimonials />
+
       {/* --- 4.5. THEME & FAQ SECTION --- */}
-      <section className="py-32 px-6 max-w-4xl mx-auto border-t border-[var(--color-surface-variant)]/30">
+      <section className="py-32 px-6 max-w-4xl mx-auto">
         
         {/* Interactive Theme Preview */}
         <div className="mb-40">
