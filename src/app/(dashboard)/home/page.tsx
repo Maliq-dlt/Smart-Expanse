@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, Variants } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { motion, Variants, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -12,6 +12,7 @@ import MagneticButton from '@/components/ui/MagneticButton';
 import AnimatedNumber from '@/components/ui/AnimatedNumber';
 import HoverCard from '@/components/ui/HoverCard';
 import EmptyState from '@/components/ui/EmptyState';
+import { formatRupiah } from '@/utils/format';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -26,13 +27,7 @@ const stagger: Variants = {
   },
 };
 
-
-
 const categoryColors = ['var(--color-primary-container)', 'var(--color-tertiary-container)', 'var(--color-inverse-primary)', 'var(--color-secondary-container)'];
-
-function formatRupiah(amount: number) {
-  return new Intl.NumberFormat('id-ID').format(amount);
-}
 
 function formatDate(isoString: string) {
   const date = new Date(isoString);
@@ -40,16 +35,31 @@ function formatDate(isoString: string) {
 }
 
 // Custom Tooltip for Recharts
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, isPrivacyMode }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-surface-variant)] p-3 rounded-lg shadow-hover text-sm">
-        <p className="font-medium text-[var(--color-on-surface)] mb-2">Tanggal {label}</p>
-        <div className="flex gap-4">
-          <p className="text-[var(--color-primary)] font-mono">Masuk: Rp {formatRupiah(payload[0].value)}</p>
-          <p className="text-[var(--color-tertiary)] font-mono">Keluar: Rp {formatRupiah(payload[1].value)}</p>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.8, y: 5 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", damping: 20, stiffness: 400 }}
+        className="bg-[var(--color-surface-lowest)]/80 backdrop-blur-2xl border border-[var(--color-surface-variant)] p-4 rounded-2xl shadow-2xl text-sm min-w-[200px]"
+      >
+        <p className="font-bold text-[10px] tracking-widest uppercase text-[var(--color-outline)] mb-4 border-b border-[var(--color-surface-variant)]/50 pb-2">{label}</p>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-6">
+            <span className="flex items-center gap-2 font-medium text-[var(--color-on-surface)] text-xs">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-primary-container)] shadow-sm"></span> Masuk
+            </span>
+            <span className="text-[var(--color-on-surface)] font-mono font-semibold text-xs">{formatRupiah(payload[0].value, isPrivacyMode)}</span>
+          </div>
+          <div className="flex items-center justify-between gap-6">
+            <span className="flex items-center gap-2 font-medium text-[var(--color-on-surface)] text-xs">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-tertiary-container)] shadow-sm"></span> Keluar
+            </span>
+            <span className="text-[var(--color-on-surface)] font-mono font-semibold text-xs">{formatRupiah(payload[1].value, isPrivacyMode)}</span>
+          </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
   return null;
@@ -57,10 +67,18 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function HomePage() {
   const { openTransactionModal } = useModal();
-  const { transactions, getTotalBalance, goals, budgetCategories } = useFinanceStore();
+  const { transactions, getTotalBalance, goals, budgetCategories, isPrivacyMode, togglePrivacyMode } = useFinanceStore();
   const user = useAuthStore((s) => s.user);
   
   const txListRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 40 && !isScrolled) setIsScrolled(true);
+    else if (latest <= 40 && isScrolled) setIsScrolled(false);
+  });
 
   useGSAP(() => {
     if (!txListRef.current) return;
@@ -148,18 +166,29 @@ export default function HomePage() {
     <div className="p-6 md:p-10 xl:p-16 flex flex-col gap-10 max-w-[1200px] mx-auto w-full">
       {/* Header */}
       <motion.header
-        className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        className={`flex flex-col md:flex-row md:items-end justify-between gap-6 sticky top-0 z-30 pt-4 pb-4 -mt-4 transition-all duration-500 rounded-b-2xl ${isScrolled ? 'backdrop-blur-xl bg-[var(--color-surface-lowest)]/80 border-b border-[var(--color-surface-variant)] shadow-sm px-6 -mx-6' : 'bg-transparent'}`}
         initial="hidden"
         animate="show"
         variants={stagger}
       >
         <motion.div variants={fadeUp}>
-          <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-primary)] mb-1">
-            Overview
-          </p>
-          <h2 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif">
+          <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] mb-1">
             {getGreeting()}, {user?.name?.split(' ')[0] || 'User'} 👋
-          </h2>
+          </p>
+          <div className="flex items-center gap-4">
+            <h2 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif">
+              <AnimatedNumber value={totalBalance} prefix="Rp " className="inline-block" />
+            </h2>
+            <button
+              onClick={togglePrivacyMode}
+              className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
+              aria-label={isPrivacyMode ? "Show Balance" : "Hide Balance"}
+            >
+              <span className="material-symbols-outlined text-[24px]">
+                {isPrivacyMode ? 'visibility_off' : 'visibility'}
+              </span>
+            </button>
+          </div>
         </motion.div>
         <motion.div variants={fadeUp}>
           <MagneticButton
@@ -172,50 +201,13 @@ export default function HomePage() {
         </motion.div>
       </motion.header>
 
-      {/* AI Financial Insight */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        animate="show"
-        className="bg-gradient-to-r from-[var(--color-primary-container)]/30 to-[var(--color-tertiary-container)]/30 border border-[var(--color-primary-container)]/50 rounded-2xl p-6 shadow-sm flex gap-4 items-start relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-tertiary)]" />
-        <div className="w-10 h-10 rounded-full bg-[var(--color-surface-lowest)] flex items-center justify-center shrink-0 shadow-sm">
-          <span className="material-symbols-outlined text-[var(--color-primary)]">auto_awesome</span>
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface)] mb-1 flex items-center gap-2">
-            Smart AI Insight
-            <span className="bg-[var(--color-primary)] text-[var(--color-on-primary)] text-[10px] px-2 py-0.5 rounded-full animate-pulse">BETA</span>
-          </h3>
-          <p className="text-[var(--color-on-surface-variant)] text-sm md:text-base leading-relaxed">
-            {getFinancialInsight()}
-          </p>
-        </div>
-      </motion.div>
-
       {/* Summary Cards */}
       <motion.section
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
         initial="hidden"
         animate="show"
         variants={stagger}
       >
-        {/* Total Balance */}
-        <HoverCard variants={fadeUp} className="flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-6">
-            <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">Total Balance</span>
-            <span className="material-symbols-outlined text-[var(--color-primary-container)] bg-[var(--color-primary-container)]/10 p-1.5 rounded-full text-xl">account_balance</span>
-          </div>
-          <div>
-            <AnimatedNumber value={totalBalance} prefix="Rp " className="block text-2xl font-medium text-[var(--color-on-surface)] font-mono mb-1" />
-            <div className="flex items-center gap-1 text-[var(--color-primary)] text-sm font-medium">
-              <span className="material-symbols-outlined text-sm">trending_up</span>
-              <span>Live Updated</span>
-            </div>
-          </div>
-        </HoverCard>
-
         {/* Income */}
         <HoverCard variants={fadeUp} className="flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
@@ -302,13 +294,13 @@ export default function HomePage() {
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<CustomTooltip isPrivacyMode={isPrivacyMode} />} />
                   <Area type="monotone" dataKey="masuk" stroke="var(--color-primary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorMasuk)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
                   <Area type="monotone" dataKey="keluar" stroke="var(--color-tertiary-container)" strokeWidth={2} fillOpacity={1} fill="url(#colorKeluar)" isAnimationActive={true} animationDuration={1500} animationEasing="ease-out" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[var(--color-outline)] border border-dashed border-[var(--color-outline)]/20 rounded-xl">
+              <div className="w-full h-full flex items-center justify-center text-[var(--color-outline)] border border border-dashed border-[var(--color-outline)]/20 rounded-xl">
                 Belum ada data transaksi
               </div>
             )}
@@ -344,6 +336,7 @@ export default function HomePage() {
                       <Tooltip 
                         contentStyle={{ backgroundColor: 'var(--color-surface-lowest)', border: '1px solid var(--color-surface-variant)', borderRadius: '8px' }}
                         itemStyle={{ color: 'var(--color-on-surface)' }}
+                        formatter={(value: any) => formatRupiah(value, isPrivacyMode)}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -381,8 +374,9 @@ export default function HomePage() {
           </div>
           <div className="space-y-1" ref={txListRef}>
             {recentTransactions.map((tx) => (
-              <div
+              <motion.div
                 key={tx.id}
+                whileTap={{ scale: 0.98 }}
                 className="flex items-center justify-between p-3 hover:bg-[var(--color-surface)] rounded-lg transition-colors group cursor-pointer border border-transparent hover:border-[var(--color-surface-variant)]"
               >
                 <div className="flex items-center gap-4">
@@ -399,9 +393,9 @@ export default function HomePage() {
                   </div>
                 </div>
                 <span className={`text-sm font-normal font-mono ${tx.type === 'income' ? 'text-[var(--color-primary)]' : 'text-[var(--color-on-surface)]'}`}>
-                  {tx.type === 'income' ? '+' : '-'} Rp {formatRupiah(tx.amount)}
+                  {tx.type === 'income' ? '+' : '-'} {formatRupiah(tx.amount, isPrivacyMode)}
                 </span>
-              </div>
+              </motion.div>
             ))}
             {recentTransactions.length === 0 && (
               <EmptyState icon="receipt_long" title="Belum Ada Transaksi" description="Mulai catat transaksi pertamamu untuk melihat riwayat keuangan di sini." actionLabel="Transaksi Baru" onAction={openTransactionModal} />
@@ -425,7 +419,7 @@ export default function HomePage() {
                       <div>
                         <p className="font-medium text-[var(--color-on-surface)]">{cat.name}</p>
                         <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)]">
-                          {sisa >= 0 ? `Sisa Rp ${formatRupiah(sisa)}` : `Over budget Rp ${formatRupiah(Math.abs(sisa))}`}
+                          {sisa >= 0 ? `Sisa ${formatRupiah(sisa, isPrivacyMode)}` : `Over budget ${formatRupiah(Math.abs(sisa), isPrivacyMode)}`}
                         </p>
                       </div>
                       <span className={`text-sm font-normal font-mono ${textColor}`}>{pct}%</span>

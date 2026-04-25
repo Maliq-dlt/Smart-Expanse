@@ -24,9 +24,8 @@ export default function SignupPage() {
       // Create user in database
       const dbUser = await signupUser(email, name, password);
       
-      signup(email, dbUser.name, dbUser.id);
-      router.push('/home');
-      toast.success('Pendaftaran berhasil! Selamat datang di SmartExpense.');
+      toast.success('Pendaftaran berhasil! Silakan login.');
+      router.push('/login');
     } catch (error: any) {
       console.error('Signup failed:', error);
       toast.error(error.message || 'Pendaftaran gagal. Silakan coba lagi.');

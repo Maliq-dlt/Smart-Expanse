@@ -1,11 +1,11 @@
-import { pgTable, text, timestamp, uuid, bigint } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, bigint, boolean, jsonb, doublePrecision } from 'drizzle-orm/pg-core';
 
 // ─── Users ───
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
-  password: text('password'), // Made optional temporarily for backwards compatibility with existing users
+  password: text('password'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -28,6 +28,20 @@ export const transactions = pgTable('transactions', {
   category: text('category').notNull(),
   description: text('description'),
   date: timestamp('date').defaultNow().notNull(),
+  
+  // Split Bill
+  isSplit: boolean('is_split').default(false).notNull(),
+  splitDetails: jsonb('split_details'), // { partners: [{ name: string, amount: number, paid: boolean }] }
+  
+  // Recurring
+  isRecurring: boolean('is_recurring').default(false).notNull(),
+  frequency: text('frequency'), // 'daily', 'weekly', 'monthly', 'yearly'
+  nextOccurrence: timestamp('next_occurrence'),
+  
+  // Multi-Currency
+  currency: text('currency').default('IDR').notNull(),
+  originalAmount: bigint('original_amount', { mode: 'number' }),
+  exchangeRate: doublePrecision('exchange_rate').default(1.0),
 });
 
 // ─── Budget Categories (Anggaran) ───

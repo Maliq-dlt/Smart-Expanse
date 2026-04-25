@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Lenis from 'lenis';
 import { useFinanceStore, Goal } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { formatRupiah } from '@/utils/format';
 import confetti from 'canvas-confetti';
 
 const fadeUp = {
@@ -33,17 +35,40 @@ const colorOptions: { id: Goal['color']; label: string; bg: string }[] = [
   { id: 'secondary', label: 'Kuning', bg: 'bg-[var(--color-secondary-container)]' },
 ];
 
-function formatRupiah(amount: number) {
-  return new Intl.NumberFormat('id-ID').format(amount);
-}
-
 export default function GoalsPage() {
-  const { goals, addGoal, addFundsToGoal, deleteGoal } = useFinanceStore();
+  const { goals, addGoal, addFundsToGoal, deleteGoal, isPrivacyMode } = useFinanceStore();
   const userId = useAuthStore((s) => s.user?.userId);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [fundModalGoalId, setFundModalGoalId] = useState<string | null>(null);
   const [fundAmount, setFundAmount] = useState('');
+
+  const scrollWrapperRef = useRef<HTMLDivElement>(null);
+  const scrollContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showAddModal || !scrollWrapperRef.current || !scrollContentRef.current) return;
+
+    const lenis = new Lenis({
+      wrapper: scrollWrapperRef.current,
+      content: scrollContentRef.current,
+      lerp: 0.1,
+      duration: 1.2,
+      smoothWheel: true,
+    });
+
+    let animationFrameId: number;
+    function raf(time: number) {
+      lenis.raf(time);
+      animationFrameId = requestAnimationFrame(raf);
+    }
+    animationFrameId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      lenis.destroy();
+    };
+  }, [showAddModal]);
 
   // Add goal form
   const [formName, setFormName] = useState('');
@@ -97,12 +122,26 @@ export default function GoalsPage() {
 
   const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '');
-    setFormTarget(raw ? new Intl.NumberFormat('id-ID').format(parseInt(raw, 10)) : '');
+    if (raw) {
+      const numValue = parseInt(raw, 10);
+      if (numValue <= 9999999999) {
+        setFormTarget(new Intl.NumberFormat('id-ID').format(numValue));
+      }
+    } else {
+      setFormTarget('');
+    }
   };
 
   const handleFundChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '');
-    setFundAmount(raw ? new Intl.NumberFormat('id-ID').format(parseInt(raw, 10)) : '');
+    if (raw) {
+      const numValue = parseInt(raw, 10);
+      if (numValue <= 9999999999) {
+        setFundAmount(new Intl.NumberFormat('id-ID').format(numValue));
+      }
+    } else {
+      setFundAmount('');
+    }
   };
 
   return (
@@ -225,15 +264,15 @@ export default function GoalsPage() {
                   <div className="flex-1">
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-[var(--color-outline)]">Terkumpul</span>
-                      <span className="font-mono font-medium text-[var(--color-primary)]">Rp {formatRupiah(goal.current)}</span>
+                      <span className="font-mono font-medium text-[var(--color-primary)]">{formatRupiah(goal.current, isPrivacyMode)}</span>
                     </div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-[var(--color-outline)]">Target</span>
-                      <span className="font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(goal.target)}</span>
+                      <span className="font-mono text-[var(--color-on-surface)]">{formatRupiah(goal.target, isPrivacyMode)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--color-outline)]">Kurang</span>
-                      <span className="font-mono text-[var(--color-tertiary)]">Rp {formatRupiah(Math.max(0, remaining))}</span>
+                      <span className="font-mono text-[var(--color-tertiary)]">{formatRupiah(Math.max(0, remaining), isPrivacyMode)}</span>
                     </div>
                   </div>
                 </div>
@@ -272,81 +311,87 @@ export default function GoalsPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="bg-[var(--color-surface-lowest)] rounded-2xl w-full max-w-md p-8 shadow-2xl border border-[var(--color-surface-variant)] pointer-events-auto max-h-[90vh] overflow-y-auto"
-                initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+                ref={scrollWrapperRef}
+                data-lenis-prevent="true"
+                className="bg-[var(--color-surface-lowest)] rounded-[32px] w-full max-w-md p-8 shadow-2xl border border-[var(--color-surface-variant)]/40 pointer-events-auto max-h-[90vh] overflow-y-auto relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                initial={{ scale: 0.95, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <h2 className="text-2xl font-serif text-[var(--color-on-surface)] mb-6">Tambah Tujuan Baru</h2>
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-2">Nama Tujuan</label>
+                <div ref={scrollContentRef}>
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-2xl font-serif text-[var(--color-on-surface)]">Tambah Tujuan</h2>
+                  <button onClick={() => { setShowAddModal(false); resetForm(); }} className="text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors p-1 rounded-full hover:bg-[var(--color-surface-container)]">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="border-b border-[var(--color-surface-variant)]/50 focus-within:border-[var(--color-primary)] transition-colors pb-2">
+                    <label className="block text-[10px] font-bold tracking-widest uppercase text-[var(--color-outline)] mb-1">Nama Tujuan</label>
                     <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)}
-                      className="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface)] px-4 py-3 rounded-xl border border-transparent focus:border-[var(--color-primary)] outline-none transition-all"
+                      className="w-full bg-transparent border-none focus:ring-0 p-0 text-lg text-[var(--color-on-surface)] placeholder:text-[var(--color-surface-variant)]"
                       placeholder="Misal: Liburan Bali" />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-2">Ikon</label>
+                    <label className="block text-[10px] font-bold tracking-widest uppercase text-[var(--color-outline)] mb-3">Ikon</label>
                     <div className="grid grid-cols-4 gap-2">
                       {goalIconOptions.map((icon) => (
                         <button key={icon.id} type="button" onClick={() => setFormIcon(icon.id)}
-                          className={`flex flex-col items-center p-2 rounded-xl text-xs gap-1 transition-all ${
+                          className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all gap-1 ${
                             formIcon === icon.id
-                              ? 'bg-[var(--color-primary-container)]/20 border border-[var(--color-primary-container)] text-[var(--color-primary)]'
-                              : 'bg-[var(--color-surface-low)] text-[var(--color-outline)] hover:bg-[var(--color-surface-variant)]'
+                              ? 'bg-[var(--color-primary-container)]/20 border border-[var(--color-primary-container)] text-[var(--color-primary)] shadow-sm'
+                              : 'bg-[var(--color-surface-low)] border border-transparent text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]'
                           }`}>
-                          <span className="material-symbols-outlined text-lg">{icon.id}</span>
-                          <span>{icon.label}</span>
+                          <span className="material-symbols-outlined text-xl" style={formIcon === icon.id ? { fontVariationSettings: "'FILL' 1" } : {}}>{icon.id}</span>
+                          <span className="text-[10px] font-medium">{icon.label}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-2">Warna</label>
+                    <label className="block text-[10px] font-bold tracking-widest uppercase text-[var(--color-outline)] mb-3">Warna</label>
                     <div className="flex gap-3">
                       {colorOptions.map((c) => (
                         <button key={c.id} type="button" onClick={() => setFormColor(c.id)}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all ${
+                          className={`flex items-center justify-center w-10 h-10 rounded-full transition-all ${
                             formColor === c.id
-                              ? 'ring-2 ring-[var(--color-primary)] bg-[var(--color-surface-low)]'
-                              : 'bg-[var(--color-surface-low)] hover:bg-[var(--color-surface-variant)]'
-                          }`}>
-                          <div className={`w-4 h-4 rounded-full ${c.bg}`} />
-                          <span className="text-[var(--color-on-surface)]">{c.label}</span>
+                              ? 'ring-2 ring-offset-2 ring-offset-[var(--color-surface-lowest)] ring-[var(--color-on-surface)] shadow-md'
+                              : 'hover:scale-110'
+                          } ${c.bg}`}>
+                          {formColor === c.id && <span className="material-symbols-outlined text-white text-sm">check</span>}
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-2">Target (Rp)</label>
+                  <div className="border-b border-[var(--color-surface-variant)]/50 focus-within:border-[var(--color-primary)] transition-colors pb-2 pt-2">
+                    <label className="block text-[10px] font-bold tracking-widest uppercase text-[var(--color-outline)] mb-1">Target (Rp)</label>
                     <div className="relative flex items-center">
-                      <span className="absolute left-4 text-lg font-mono text-[var(--color-outline)]">Rp</span>
+                      <span className={`absolute left-0 font-mono text-[var(--color-on-surface-variant)] transition-all ${formTarget.length > 11 ? 'text-lg' : 'text-xl'}`}>Rp</span>
                       <input type="text" value={formTarget} onChange={handleTargetChange}
-                        className="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface)] pl-12 pr-4 py-3 rounded-xl border border-transparent focus:border-[var(--color-primary)] outline-none transition-all text-right font-mono text-lg"
+                        className={`w-full bg-transparent text-[var(--color-on-surface)] pl-10 pr-0 py-2 border-none focus:ring-0 outline-none transition-all text-left font-mono placeholder:text-[var(--color-surface-variant)] ${formTarget.length > 11 ? 'text-xl' : 'text-2xl'}`}
                         placeholder="0" />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-2">Target Waktu</label>
+                  <div className="border-b border-[var(--color-surface-variant)]/50 focus-within:border-[var(--color-primary)] transition-colors pb-2">
+                    <label className="block text-[10px] font-bold tracking-widest uppercase text-[var(--color-outline)] mb-1">Target Waktu</label>
                     <input type="text" value={formDeadline} onChange={(e) => setFormDeadline(e.target.value)}
-                      className="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface)] px-4 py-3 rounded-xl border border-transparent focus:border-[var(--color-primary)] outline-none transition-all"
+                      className="w-full bg-transparent border-none focus:ring-0 p-0 text-lg text-[var(--color-on-surface)] placeholder:text-[var(--color-surface-variant)]"
                       placeholder="Misal: Des 2025" />
                   </div>
 
-                  <div className="flex gap-3 pt-2">
-                    <button onClick={() => { setShowAddModal(false); resetForm(); }}
-                      className="flex-1 py-3 rounded-xl bg-[var(--color-surface-low)] text-[var(--color-on-surface)] font-medium hover:bg-[var(--color-surface-container)] transition-colors">
-                      Batal
-                    </button>
+                  <div className="pt-6">
                     <button onClick={handleAddGoal}
-                      className="flex-1 py-3 rounded-xl bg-[var(--color-primary)] text-[var(--color-on-primary)] font-medium hover:-translate-y-0.5 hover:shadow-lg transition-all">
-                      Tambah
+                      className="w-full py-4 rounded-xl bg-[var(--color-primary)] text-[var(--color-on-primary)] font-semibold shadow-soft flex justify-center items-center gap-2 hover:-translate-y-0.5 hover:shadow-hover transition-all">
+                      <span className="material-symbols-outlined text-xl">check_circle</span>
+                      Simpan Tujuan
                     </button>
                   </div>
+                </div>
                 </div>
               </motion.div>
             </motion.div>
@@ -367,34 +412,39 @@ export default function GoalsPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
               <motion.div
-                className="bg-[var(--color-surface-lowest)] rounded-2xl w-full max-w-sm p-8 shadow-2xl border border-[var(--color-surface-variant)] pointer-events-auto"
-                initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+                data-lenis-prevent="true"
+                className="bg-[var(--color-surface-lowest)] rounded-[32px] w-full max-w-sm p-8 shadow-2xl border border-[var(--color-surface-variant)]/40 pointer-events-auto"
+                initial={{ scale: 0.95, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <h2 className="text-2xl font-serif text-[var(--color-on-surface)] mb-2">Tambah Dana</h2>
-                <p className="text-sm text-[var(--color-outline)] mb-6">
-                  {goals.find(g => g.id === fundModalGoalId)?.name}
-                </p>
-
-                <div className="relative flex items-center mb-6">
-                  <span className="absolute left-4 text-xl font-mono text-[var(--color-outline)]">Rp</span>
-                  <input type="text" value={fundAmount} onChange={handleFundChange}
-                    className="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface)] pl-14 pr-4 py-4 rounded-xl border border-transparent focus:border-[var(--color-primary)] outline-none transition-all text-right font-mono text-2xl"
-                    placeholder="0" autoFocus />
-                </div>
-
-                <div className="flex gap-3">
-                  <button onClick={() => setFundModalGoalId(null)}
-                    className="flex-1 py-3 rounded-xl bg-[var(--color-surface-low)] text-[var(--color-on-surface)] font-medium hover:bg-[var(--color-surface-container)] transition-colors">
-                    Batal
-                  </button>
-                  <button onClick={handleAddFunds}
-                    className="flex-1 py-3 rounded-xl bg-[var(--color-primary)] text-[var(--color-on-primary)] font-medium hover:-translate-y-0.5 hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                    <span className="material-symbols-outlined text-lg">savings</span>
-                    Tabung
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h2 className="text-2xl font-serif text-[var(--color-on-surface)]">Tambah Dana</h2>
+                    <p className="text-sm text-[var(--color-primary)] font-medium mt-1">
+                      {goals.find(g => g.id === fundModalGoalId)?.name}
+                    </p>
+                  </div>
+                  <button onClick={() => setFundModalGoalId(null)} className="text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors p-1 rounded-full hover:bg-[var(--color-surface-container)]">
+                    <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
+
+                <div className="flex flex-col items-center justify-center py-6 mb-4 border-b border-[var(--color-surface-variant)]/50 focus-within:border-[var(--color-primary)] transition-colors">
+                  <label className="text-[10px] font-bold tracking-widest uppercase text-[var(--color-outline)] mb-3">Nominal Tabungan</label>
+                  <div className="flex items-center justify-center gap-2 w-full">
+                    <span className={`font-light text-[var(--color-outline)] transition-all ${fundAmount.length > 11 ? 'text-xl' : fundAmount.length > 7 ? 'text-2xl' : 'text-3xl'}`}>Rp</span>
+                    <input type="text" value={fundAmount} onChange={handleFundChange}
+                      className={`bg-transparent font-light text-[var(--color-on-surface)] text-center outline-none w-full max-w-[280px] placeholder:text-[var(--color-surface-variant)] transition-all ${fundAmount.length > 11 ? 'text-3xl' : fundAmount.length > 7 ? 'text-4xl' : 'text-5xl'}`}
+                      placeholder="0" autoFocus />
+                  </div>
+                </div>
+
+                <button onClick={handleAddFunds}
+                  className="w-full py-4 rounded-xl bg-[var(--color-primary)] text-[var(--color-on-primary)] font-semibold shadow-soft flex justify-center items-center gap-2 hover:-translate-y-0.5 hover:shadow-hover transition-all">
+                  <span className="material-symbols-outlined text-xl">savings</span>
+                  Tabung Sekarang
+                </button>
               </motion.div>
             </motion.div>
           </>

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, Legend } from 'recharts';
 import { useFinanceStore } from '@/store/useFinanceStore';
+import { formatRupiah } from '@/utils/format';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -15,20 +16,14 @@ const stagger = {
   show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
-
-
-function formatRupiah(amount: number) {
-  return new Intl.NumberFormat('id-ID').format(amount);
-}
-
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, isPrivacyMode }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[var(--color-surface-lowest)] border border-[var(--color-surface-variant)] p-3 rounded-lg shadow-hover text-sm">
         <p className="font-medium text-[var(--color-on-surface)] mb-2">{label}</p>
         <div className="flex flex-col gap-1">
-          <p className="text-[var(--color-primary)] font-mono">Pemasukan: Rp {formatRupiah(payload[0].value)}</p>
-          <p className="text-[var(--color-tertiary)] font-mono">Pengeluaran: Rp {formatRupiah(payload[1].value)}</p>
+          <p className="text-[var(--color-primary)] font-mono">Pemasukan: {formatRupiah(payload[0].value, isPrivacyMode)}</p>
+          <p className="text-[var(--color-tertiary)] font-mono">Pengeluaran: {formatRupiah(payload[1].value, isPrivacyMode)}</p>
         </div>
       </div>
     );
@@ -38,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function ReportsPage() {
   const [period, setPeriod] = useState<'monthly' | 'weekly' | 'yearly'>('monthly');
-  const { transactions } = useFinanceStore();
+  const { transactions, isPrivacyMode } = useFinanceStore();
 
   const handleExportCSV = () => {
     if (transactions.length === 0) return;
@@ -132,15 +127,21 @@ export default function ReportsPage() {
       <motion.section className="grid grid-cols-1 md:grid-cols-4 gap-6" initial="hidden" animate="show" variants={stagger}>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Total Pemasukan</span>
-          <h3 className="text-xl font-medium font-mono text-[var(--color-primary)]">Rp {formatRupiah(totalIncome)}</h3>
+          <h3 className="text-xl font-medium font-mono text-[var(--color-primary)]">
+            {formatRupiah(totalIncome, isPrivacyMode)}
+          </h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Total Pengeluaran</span>
-          <h3 className="text-xl font-medium font-mono text-[var(--color-error)]">Rp {formatRupiah(totalExpense)}</h3>
+          <h3 className="text-xl font-medium font-mono text-[var(--color-error)]">
+            {formatRupiah(totalExpense, isPrivacyMode)}
+          </h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Net Savings</span>
-          <h3 className="text-xl font-medium font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(netSavings)}</h3>
+          <h3 className="text-xl font-medium font-mono text-[var(--color-on-surface)]">
+            {formatRupiah(netSavings, isPrivacyMode)}
+          </h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-3">Saving Rate</span>
@@ -165,14 +166,14 @@ export default function ReportsPage() {
               <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                 <BarChart data={monthlyData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barGap={8}>
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-outline)' }} dy={10} />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--color-surface-container)' }} />
+                  <Tooltip content={<CustomTooltip isPrivacyMode={isPrivacyMode} />} cursor={{ fill: 'var(--color-surface-container)' }} />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
                   <Bar dataKey="income" name="Pemasukan" fill="var(--color-primary-container)" radius={[4, 4, 0, 0]} maxBarSize={40} isAnimationActive={true} animationDuration={1000} />
                   <Bar dataKey="expense" name="Pengeluaran" fill="var(--color-tertiary-container)" radius={[4, 4, 0, 0]} maxBarSize={40} isAnimationActive={true} animationDuration={1000} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[var(--color-outline)] border border-dashed border-[var(--color-outline)]/20 rounded-xl">
+              <div className="w-full h-full flex items-center justify-center text-[var(--color-outline)] border border border-dashed border-[var(--color-outline)]/20 rounded-xl">
                 Belum ada data transaksi
               </div>
             )}
@@ -202,7 +203,7 @@ export default function ReportsPage() {
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: `var(--color-${category.color})` }}></div>
                     <span className="text-sm font-medium text-[var(--color-on-surface)]">{category.name}</span>
                   </div>
-                  <span className="text-sm font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(category.amount)}</span>
+                  <span className="text-sm font-mono text-[var(--color-on-surface)]">{formatRupiah(category.amount, isPrivacyMode)}</span>
                 </div>
                 <div className="w-full bg-[var(--color-surface-container)] rounded-full h-1.5 overflow-hidden flex items-center">
                   <motion.div

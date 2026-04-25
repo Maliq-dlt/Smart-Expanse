@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useInView, useMotionValue, useSpring } from 'framer-motion';
+import { useFinanceStore } from '@/store/useFinanceStore';
 
 interface AnimatedNumberProps {
   value: number;
@@ -26,6 +27,7 @@ export default function AnimatedNumber({
     bounce: 0,
   });
   const [hasAnimated, setHasAnimated] = useState(false);
+  const { isPrivacyMode } = useFinanceStore();
 
   // Initial animation on view
   useEffect(() => {
@@ -45,10 +47,25 @@ export default function AnimatedNumber({
   useEffect(() => {
     return springValue.on('change', (latest) => {
       if (ref.current) {
-        ref.current.textContent = `${prefix}${Intl.NumberFormat('id-ID').format(Math.round(latest))}${suffix}`;
+        if (isPrivacyMode) {
+          ref.current.textContent = `${prefix}••••••${suffix}`;
+        } else {
+          ref.current.textContent = `${prefix}${Intl.NumberFormat('id-ID').format(Math.round(latest))}${suffix}`;
+        }
       }
     });
-  }, [springValue, prefix, suffix]);
+  }, [springValue, prefix, suffix, isPrivacyMode]);
+
+  // Handle immediate change when toggling privacy mode
+  useEffect(() => {
+    if (ref.current) {
+      if (isPrivacyMode) {
+        ref.current.textContent = `${prefix}••••••${suffix}`;
+      } else {
+        ref.current.textContent = `${prefix}${Intl.NumberFormat('id-ID').format(Math.round(springValue.get()))}${suffix}`;
+      }
+    }
+  }, [isPrivacyMode, prefix, suffix, springValue]);
 
   return <span ref={ref} className={className} />;
 }

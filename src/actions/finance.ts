@@ -32,8 +32,28 @@ export async function signupUser(email: string, name: string, password?: string)
 
   // Create new user
   const newUser = await db.insert(schema.users).values({ email, name, password }).returning();
+  const user = newUser[0];
 
-  return newUser[0];
+  // Seed default data for the new user so the dashboard isn't completely empty
+  await db.insert(schema.accounts).values([
+    { userId: user.id, name: 'BCA Utama', type: 'Bank', balance: 5000000 },
+    { userId: user.id, name: 'Gopay', type: 'E-Wallet', balance: 250000 },
+    { userId: user.id, name: 'Cash', type: 'Cash', balance: 500000 },
+  ]);
+
+  await db.insert(schema.budgetCategories).values([
+    { userId: user.id, name: 'Makanan & Minuman', icon: 'restaurant', allocated: 3000000, spent: 0 },
+    { userId: user.id, name: 'Transportasi', icon: 'directions_car', allocated: 1000000, spent: 0 },
+    { userId: user.id, name: 'Belanja Harian', icon: 'shopping_cart', allocated: 1500000, spent: 0 },
+    { userId: user.id, name: 'Tagihan & Utilitas', icon: 'receipt_long', allocated: 2000000, spent: 0 },
+  ]);
+
+  await db.insert(schema.goals).values([
+    { userId: user.id, name: 'Dana Darurat', icon: 'health_and_safety', target: 20000000, current: 5000000, deadline: 'Des 2026', color: 'primary' },
+    { userId: user.id, name: 'Liburan Jepang', icon: 'flight', target: 15000000, current: 2000000, deadline: 'Agt 2026', color: 'tertiary' },
+  ]);
+
+  return user;
 }
 
 // ─── Fetch All User Data ───

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useFinanceStore } from '@/store/useFinanceStore';
 import { useEffect, useState } from 'react';
 
 const navItems = [
@@ -31,6 +32,7 @@ const item = {
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, isAuthenticated } = useAuthStore();
+  const { isPrivacyMode, togglePrivacyMode } = useFinanceStore();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

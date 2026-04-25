@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFinanceStore, BudgetCategory } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { formatRupiah } from '@/utils/format';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -26,12 +27,8 @@ const iconOptions = [
   { id: 'checkroom', label: 'Pakaian' },
 ];
 
-function formatRupiah(amount: number) {
-  return new Intl.NumberFormat('id-ID').format(amount);
-}
-
 export default function BudgetPage() {
-  const { budgetCategories, addBudgetCategory, updateBudgetCategory, deleteBudgetCategory } = useFinanceStore();
+  const { budgetCategories, addBudgetCategory, updateBudgetCategory, deleteBudgetCategory, isPrivacyMode } = useFinanceStore();
   const userId = useAuthStore((s) => s.user?.userId);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -60,7 +57,7 @@ export default function BudgetPage() {
   const openEdit = (cat: BudgetCategory) => {
     setFormName(cat.name);
     setFormIcon(cat.icon);
-    setFormAllocated(formatRupiah(cat.allocated));
+    setFormAllocated(formatRupiah(cat.allocated, false)); // Don't hide in edit
     setEditingId(cat.id);
     setShowAddModal(true);
   };
@@ -93,7 +90,7 @@ export default function BudgetPage() {
         animate={{ opacity: 1, y: 0 }}
       >
         <div>
-          <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-primary)] mb-1">Oktober 2024</p>
+          <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-primary)] mb-1">Pengaturan Anggaran</p>
           <h1 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif flex overflow-hidden flex-wrap">
             {"Anggaran Bulanan".split(' ').map((word, i) => (
               <motion.span
@@ -121,16 +118,20 @@ export default function BudgetPage() {
       <motion.section className="grid grid-cols-1 md:grid-cols-3 gap-6" initial="hidden" animate="show" variants={stagger}>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] mb-4 block">Total Anggaran</span>
-          <h3 className="text-2xl font-medium font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(totalAllocated)}</h3>
+          <h3 className="text-2xl font-medium font-mono text-[var(--color-on-surface)]">
+            Rp {formatRupiah(totalAllocated, isPrivacyMode)}
+          </h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] mb-4 block">Total Terpakai</span>
-          <h3 className="text-2xl font-medium font-mono text-[var(--color-tertiary)]">Rp {formatRupiah(totalSpent)}</h3>
+          <h3 className="text-2xl font-medium font-mono text-[var(--color-tertiary)]">
+            Rp {formatRupiah(totalSpent, isPrivacyMode)}
+          </h3>
         </motion.div>
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] mb-4 block">Sisa Anggaran</span>
           <h3 className={`text-2xl font-medium font-mono ${totalRemaining >= 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-error)]'}`}>
-            Rp {formatRupiah(Math.abs(totalRemaining))}
+            Rp {formatRupiah(Math.abs(totalRemaining), isPrivacyMode)}
           </h3>
         </motion.div>
       </motion.section>
@@ -206,7 +207,7 @@ export default function BudgetPage() {
                     <div>
                       <p className="font-medium text-[var(--color-on-surface)]">{cat.name}</p>
                       <p className="text-xs text-[var(--color-outline)]">
-                        {isOver ? `Over budget Rp ${formatRupiah(Math.abs(remaining))}` : `Sisa Rp ${formatRupiah(remaining)}`}
+                        {isOver ? `Over budget ${formatRupiah(Math.abs(remaining), isPrivacyMode)}` : `Sisa ${formatRupiah(remaining, isPrivacyMode)}`}
                       </p>
                     </div>
                   </div>
@@ -237,8 +238,8 @@ export default function BudgetPage() {
                   />
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-[var(--color-outline)]">
-                  <span>Rp {formatRupiah(cat.spent)} terpakai</span>
-                  <span>dari Rp {formatRupiah(cat.allocated)}</span>
+                  <span>{formatRupiah(cat.spent, isPrivacyMode)} terpakai</span>
+                  <span>dari {formatRupiah(cat.allocated, isPrivacyMode)}</span>
                 </div>
               </motion.div>
             );

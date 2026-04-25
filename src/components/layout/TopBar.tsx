@@ -1,6 +1,7 @@
 'use client';
 
 import { useModal } from '@/contexts/ModalContext';
+import { useFinanceStore } from '@/store/useFinanceStore';
 import { motion, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
 import { useState } from 'react';
 
@@ -8,6 +9,7 @@ export default function TopBar() {
   const { openTransactionModal } = useModal();
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isPrivacyMode, togglePrivacyMode } = useFinanceStore();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest > 20 && !isScrolled) {
@@ -31,6 +33,15 @@ export default function TopBar() {
         SmartExpense
       </h1>
       <div className="flex items-center space-x-1">
+        <button
+          onClick={togglePrivacyMode}
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
+          aria-label={isPrivacyMode ? "Show Balance" : "Hide Balance"}
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {isPrivacyMode ? 'visibility_off' : 'visibility'}
+          </span>
+        </button>
         <button
           className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
           aria-label="Notifications"

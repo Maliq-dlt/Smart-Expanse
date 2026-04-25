@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useFinanceStore } from '@/store/useFinanceStore';
+import { formatRupiah } from '@/utils/format';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -13,13 +14,8 @@ const stagger = {
   show: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
 
-
-function formatRupiah(amount: number) {
-  return new Intl.NumberFormat('id-ID').format(amount);
-}
-
 export default function AccountsPage() {
-  const { accounts, transactions } = useFinanceStore();
+  const { accounts, transactions, isPrivacyMode } = useFinanceStore();
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
   // Helper to get last 2 activities for an account
@@ -29,7 +25,7 @@ export default function AccountsPage() {
       .slice(0, 2)
       .map(t => ({
         desc: t.desc,
-        amount: t.type === 'income' ? `+Rp ${formatRupiah(t.amount)}` : `-Rp ${formatRupiah(t.amount)}`,
+        amount: t.type === 'income' ? `+ ${formatRupiah(t.amount, isPrivacyMode)}` : `- ${formatRupiah(t.amount, isPrivacyMode)}`,
         date: new Date(t.date).toLocaleDateString('id-ID'),
         type: t.type
       }));
@@ -73,7 +69,9 @@ export default function AccountsPage() {
         className="bg-[var(--color-primary-container)]/10 dark:bg-[var(--color-primary-container)]/5 rounded-2xl p-8 border border-[var(--color-primary-container)]/30"
       >
         <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-primary)] mb-2 block">Total Saldo Semua Akun</span>
-        <h2 className="text-4xl font-medium font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(totalBalance)}</h2>
+        <h2 className="text-4xl font-medium font-mono text-[var(--color-on-surface)]">
+          Rp {formatRupiah(totalBalance, isPrivacyMode)}
+        </h2>
         <p className="text-sm text-[var(--color-outline)] mt-2">{accounts.length} akun terhubung</p>
       </motion.div>
 
@@ -107,7 +105,9 @@ export default function AccountsPage() {
             {/* Balance */}
             <div className="mb-6">
               <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-outline)] block mb-1">Saldo</span>
-              <h3 className="text-2xl font-medium font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(account.balance)}</h3>
+              <h3 className="text-2xl font-medium font-mono text-[var(--color-on-surface)]">
+                Rp {formatRupiah(account.balance, isPrivacyMode)}
+              </h3>
             </div>
 
             {/* Recent Activity */}

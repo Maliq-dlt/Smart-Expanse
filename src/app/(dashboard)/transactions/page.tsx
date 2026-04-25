@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { SkeletonTransactionItem } from '@/components/ui/SkeletonCard';
+import { formatRupiah, formatCurrency } from '@/utils/format';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -16,19 +17,14 @@ const stagger = {
   show: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
-function formatRupiah(amount: number) {
-  return new Intl.NumberFormat('id-ID').format(amount);
-}
-
 function formatDate(isoString: string) {
   const date = new Date(isoString);
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export default function TransactionsPage() {
-  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const { transactions, deleteTransaction } = useFinanceStore();
+  const { transactions, deleteTransaction, isPrivacyMode } = useFinanceStore();
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -93,7 +89,7 @@ export default function TransactionsPage() {
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl shadow-soft p-6 flex flex-col gap-3 hover:-translate-y-0.5 hover:shadow-hover transition-all duration-300 border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)]">Total Pemasukan</span>
           <div className="flex items-end justify-between mt-auto">
-            <span className="text-2xl font-medium font-mono text-[var(--color-primary)]">Rp {formatRupiah(totalIncome)}</span>
+            <span className="text-2xl font-medium font-mono text-[var(--color-primary)]">{formatRupiah(totalIncome, isPrivacyMode)}</span>
             <div className="bg-[var(--color-primary-container)]/20 px-2 py-1 rounded-full">
               <span className="material-symbols-outlined text-xs text-[var(--color-primary)]">trending_up</span>
             </div>
@@ -103,7 +99,7 @@ export default function TransactionsPage() {
         <motion.div variants={fadeUp} className="bg-[var(--color-surface-lowest)] rounded-xl shadow-soft p-6 flex flex-col gap-3 hover:-translate-y-0.5 hover:shadow-hover transition-all duration-300 border border-[var(--color-surface-variant)]/50">
           <span className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)]">Total Pengeluaran</span>
           <div className="flex items-end justify-between mt-auto">
-            <span className="text-2xl font-medium font-mono text-[var(--color-error)]">Rp {formatRupiah(totalExpense)}</span>
+            <span className="text-2xl font-medium font-mono text-[var(--color-error)]">{formatRupiah(totalExpense, isPrivacyMode)}</span>
             <div className="bg-[var(--color-error-container)]/40 px-2 py-1 rounded-full">
               <span className="material-symbols-outlined text-xs text-[var(--color-error)]">trending_down</span>
             </div>
@@ -125,14 +121,9 @@ export default function TransactionsPage() {
           </div>
           <select className="bg-[var(--color-surface-low)] text-[var(--color-on-surface)] text-sm rounded-lg px-3 py-2 border border-transparent hover:border-[var(--color-surface-variant)] focus:border-[var(--color-primary)] focus:outline-none transition-colors">
             <option>All Categories</option>
-            <option>Food & Dining</option>
-            <option>Shopping</option>
-            <option>Travel</option>
           </select>
           <select className="bg-[var(--color-surface-low)] text-[var(--color-on-surface)] text-sm rounded-lg px-3 py-2 border border-transparent hover:border-[var(--color-surface-variant)] focus:border-[var(--color-primary)] focus:outline-none transition-colors">
             <option>All Accounts</option>
-            <option>Cash</option>
-            <option>Main Bank</option>
           </select>
         </div>
         <div className="flex items-center gap-2">
@@ -168,8 +159,6 @@ export default function TransactionsPage() {
               <SkeletonTransactionItem />
               <SkeletonTransactionItem />
               <SkeletonTransactionItem />
-              <SkeletonTransactionItem />
-              <SkeletonTransactionItem />
             </div>
           ) : (
             <>
@@ -195,7 +184,22 @@ export default function TransactionsPage() {
                     }`}
                   >
                     <div className="col-span-2 text-sm font-mono text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-on-surface)] transition-colors">{formatDate(tx.date)}</div>
-                    <div className="col-span-4 font-medium truncate text-[var(--color-on-surface)]">{tx.desc}</div>
+                    <div className="col-span-4 flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium truncate text-[var(--color-on-surface)]">{tx.desc}</span>
+                        {tx.isRecurring && (
+                          <span className="material-symbols-outlined text-[14px] text-[var(--color-primary)]" title={`Rutin (${tx.frequency})`}>sync</span>
+                        )}
+                        {tx.isSplit && (
+                          <span className="material-symbols-outlined text-[14px] text-[var(--color-tertiary)]" title="Split Bill">groups</span>
+                        )}
+                      </div>
+                      {tx.isSplit && tx.splitDetails && (
+                        <span className="text-[10px] text-[var(--color-outline)]">
+                          Ditanggung oleh: {tx.splitDetails.partners.map(p => p.name).join(', ')}
+                        </span>
+                      )}
+                    </div>
                     <div className="col-span-2 flex items-center gap-2">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                         tx.type === 'income' ? 'bg-[var(--color-primary-container)]/20 text-[var(--color-primary)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]'
@@ -205,8 +209,15 @@ export default function TransactionsPage() {
                       <span className="text-sm text-[var(--color-on-surface-variant)]">{tx.category}</span>
                     </div>
                     <div className="col-span-2 text-sm text-[var(--color-on-surface-variant)]">{tx.account}</div>
-                    <div className={`col-span-2 text-sm font-mono text-right ${tx.type === 'expense' ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`}>
-                      {tx.type === 'expense' ? '-' : '+'} Rp {formatRupiah(tx.amount)}
+                    <div className={`col-span-2 text-sm font-mono text-right flex flex-col ${tx.type === 'expense' ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`}>
+                      <span>
+                        {tx.type === 'expense' ? '-' : '+'} {formatRupiah(tx.amount, isPrivacyMode)}
+                      </span>
+                      {tx.currency && tx.currency !== 'IDR' && tx.originalAmount && (
+                        <span className="text-[10px] text-[var(--color-outline)]">
+                          ({tx.type === 'expense' ? '-' : '+'} {formatCurrency(tx.originalAmount, tx.currency, isPrivacyMode)})
+                        </span>
+                      )}
                     </div>
                   </motion.div>
                 </div>

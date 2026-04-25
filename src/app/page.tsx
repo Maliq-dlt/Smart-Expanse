@@ -9,6 +9,7 @@ import Lenis from 'lenis';
 import HeroSection from '@/components/landing/HeroSection';
 import InfiniteMarquee from '@/components/landing/InfiniteMarquee';
 import StatsCounter from '@/components/landing/StatsCounter';
+import AISmartInsight from '@/components/landing/AISmartInsight';
 import FeatureBentoBox from '@/components/landing/FeatureBentoBox';
 import FeatureTabs from '@/components/landing/FeatureTabs';
 import TrustedBy from '@/components/landing/TrustedBy';
@@ -118,6 +119,7 @@ export default function LandingPage() {
         <HeroSection />
         <InfiniteMarquee />
         <StatsCounter />
+        <AISmartInsight />
         
         <section className="bg-[var(--color-background)] border-b border-[var(--color-surface-variant)]/30">
           <ScrollRevealText text="Kebebasan finansial dimulai dari satu langkah kecil. Lacak, kelola, dan raih impian Anda." />

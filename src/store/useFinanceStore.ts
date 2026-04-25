@@ -12,14 +12,30 @@ import {
 
 export type TransactionType = 'income' | 'expense';
 
+export interface SplitPartner {
+  name: string;
+  amount: number;
+  paid: boolean;
+}
+
 export interface Transaction {
   id: string;
   desc: string;
-  amount: number;
+  amount: number; // In IDR (converted if multi-currency)
   type: TransactionType;
   category: string;
   date: string;
   account: string;
+  
+  // New features
+  isSplit?: boolean;
+  splitDetails?: { partners: SplitPartner[] };
+  isRecurring?: boolean;
+  frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  nextOccurrence?: string;
+  currency?: string;
+  originalAmount?: number;
+  exchangeRate?: number;
 }
 
 export interface Account {
@@ -80,6 +96,10 @@ interface FinanceState {
   getTotalBalance: () => number;
   getIncomeExpenseByMonth: (month: string) => { income: number; expense: number };
   getSpentByCategory: (categoryName: string) => number;
+
+  // UI state
+  isPrivacyMode: boolean;
+  togglePrivacyMode: () => void;
 }
 
 export const useFinanceStore = create<FinanceState>()(
@@ -89,6 +109,9 @@ export const useFinanceStore = create<FinanceState>()(
     budgetCategories: [],
     goals: [],
     isLoaded: false,
+    isPrivacyMode: false,
+
+    togglePrivacyMode: () => set((state) => ({ isPrivacyMode: !state.isPrivacyMode })),
 
     // ─── Hydrate from Database ───
     setInitialData: (data) => set({
