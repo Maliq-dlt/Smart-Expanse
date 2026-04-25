@@ -35,14 +35,23 @@ export default function HoverCard({ children, className = '', variants }: HoverC
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`relative overflow-hidden bg-[var(--color-surface-lowest)]/80 backdrop-blur-md rounded-xl p-6 shadow-soft border border-[var(--color-surface-variant)]/50 transition-all duration-300 hover:-translate-y-1 group ${className}`}
+      className={`relative overflow-hidden bg-[var(--color-surface-lowest)]/80 backdrop-blur-xl rounded-2xl p-6 shadow-soft border border-[var(--color-surface-variant)]/60 transition-all duration-500 hover:-translate-y-1 hover:shadow-hover group ${className}`}
     >
-      {/* Spotlight effect */}
+      {/* Subtle border glow effect */}
       <div
-        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-0"
         style={{
-          opacity,
-          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, var(--color-primary-container), transparent 40%)`,
+          background: `radial-gradient(500px circle at ${position.x}px ${position.y}px, var(--color-primary-container), transparent 40%)`,
+          opacity: opacity * 0.15,
+        }}
+      />
+      
+      {/* Inner subtle glow */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-0"
+        style={{
+          background: `radial-gradient(300px circle at ${position.x}px ${position.y}px, var(--color-primary)/10, transparent 40%)`,
+          opacity: opacity * 0.4,
         }}
       />
       

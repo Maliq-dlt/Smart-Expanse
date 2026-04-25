@@ -1,29 +1,49 @@
 'use client';
 
 import { useModal } from '@/contexts/ModalContext';
+import { motion, useScroll, useMotionValueEvent, useTransform } from 'framer-motion';
+import { useState } from 'react';
 
 export default function TopBar() {
   const { openTransactionModal } = useModal();
+  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 20 && !isScrolled) {
+      setIsScrolled(true);
+    } else if (latest <= 20 && isScrolled) {
+      setIsScrolled(false);
+    }
+  });
+
+  const width = useTransform(scrollY, [0, 50], ["100%", "90%"]);
+  const y = useTransform(scrollY, [0, 50], [0, 10]);
+  const borderRadius = useTransform(scrollY, [0, 50], ["0px", "9999px"]);
+  const paddingX = useTransform(scrollY, [0, 50], ["24px", "16px"]);
 
   return (
-    <header className="md:hidden flex justify-between items-center w-full px-6 h-16 apple-glass border-b border-[var(--color-sidebar-border)] fixed top-0 z-40 transition-colors duration-300">
-      <h1 className="text-xl font-bold text-[var(--color-navy)] font-serif">
+    <motion.header 
+      style={{ width, y, borderRadius, paddingLeft: paddingX, paddingRight: paddingX }}
+      className={`md:hidden flex justify-between items-center h-14 apple-glass fixed top-0 left-0 right-0 mx-auto z-40 transition-shadow duration-300 ${isScrolled ? 'shadow-hover border border-[var(--color-surface-variant)]/50' : 'border-b border-[var(--color-surface-variant)]/50'}`}
+    >
+      <h1 className={`font-bold text-[var(--color-on-surface)] font-serif transition-all duration-300 ${isScrolled ? 'text-sm ml-2' : 'text-xl'}`}>
         SmartExpense
       </h1>
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-1">
         <button
-          className="text-[var(--color-primary-container)] dark:text-[var(--color-primary)] hover:opacity-80 transition-colors rounded-full p-1"
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
           aria-label="Notifications"
         >
-          <span className="material-symbols-outlined">notifications</span>
+          <span className="material-symbols-outlined text-[20px]">notifications</span>
         </button>
         <button
-          className="text-[var(--color-primary-container)] dark:text-[var(--color-primary)] hover:opacity-80 transition-colors rounded-full p-1"
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
           aria-label="Profile"
         >
-          <span className="material-symbols-outlined">account_circle</span>
+          <span className="material-symbols-outlined text-[20px]">account_circle</span>
         </button>
       </div>
-    </header>
+    </motion.header>
   );
 }

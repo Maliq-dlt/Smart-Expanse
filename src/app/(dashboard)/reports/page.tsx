@@ -40,6 +40,27 @@ export default function ReportsPage() {
   const [period, setPeriod] = useState<'monthly' | 'weekly' | 'yearly'>('monthly');
   const { transactions } = useFinanceStore();
 
+  const handleExportCSV = () => {
+    if (transactions.length === 0) return;
+    
+    const headers = ['Tanggal', 'Nama Transaksi', 'Kategori', 'Akun', 'Tipe', 'Jumlah (Rp)'];
+    const rows = transactions.map(t => {
+      const date = new Date(t.date).toLocaleDateString('id-ID');
+      const type = t.type === 'income' ? 'Pemasukan' : 'Pengeluaran';
+      return `"${date}","${t.desc}","${t.category}","${t.account}","${type}","${t.amount}"`;
+    });
+    
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `laporan_smartexpense_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
   const netSavings = totalIncome - totalExpense;
@@ -167,9 +188,9 @@ export default function ReportsPage() {
       >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-normal text-[var(--color-on-surface)] font-serif">Breakdown per Kategori</h3>
-          <button className="text-[var(--color-primary)] text-xs font-semibold tracking-[0.05em] uppercase hover:underline flex items-center gap-1">
+          <button onClick={handleExportCSV} className="text-[var(--color-primary)] text-xs font-semibold tracking-[0.05em] uppercase hover:underline flex items-center gap-1">
             <span className="material-symbols-outlined text-sm">download</span>
-            Export
+            Export CSV
           </button>
         </div>
         <div className="flex flex-col justify-center h-full gap-6">
@@ -178,14 +199,15 @@ export default function ReportsPage() {
               <div key={idx} className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full bg-[var(--color-${category.color})]`}></div>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: `var(--color-${category.color})` }}></div>
                     <span className="text-sm font-medium text-[var(--color-on-surface)]">{category.name}</span>
                   </div>
                   <span className="text-sm font-mono text-[var(--color-on-surface)]">Rp {formatRupiah(category.amount)}</span>
                 </div>
                 <div className="w-full bg-[var(--color-surface-container)] rounded-full h-1.5 overflow-hidden flex items-center">
                   <motion.div
-                    className={`h-full bg-[var(--color-${category.color})]`}
+                    className="h-full"
+                    style={{ backgroundColor: `var(--color-${category.color})` }}
                     initial={{ width: 0 }}
                     animate={{ width: `${category.percentage}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.2 * idx }}

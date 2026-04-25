@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFinanceStore, Goal } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import confetti from 'canvas-confetti';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -79,6 +80,17 @@ export default function GoalsPage() {
     const amount = parseInt(fundAmount.replace(/\D/g, ''), 10);
     if (!fundModalGoalId || !amount) return;
     addFundsToGoal(fundModalGoalId, amount);
+
+    const goal = goals.find(g => g.id === fundModalGoalId);
+    if (goal && (goal.current + amount) >= goal.target) {
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#f59e0b', '#ec4899', '#3b82f6']
+      });
+    }
+
     setFundModalGoalId(null);
     setFundAmount('');
   };
@@ -103,8 +115,18 @@ export default function GoalsPage() {
       >
         <div>
           <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-primary)] mb-1">Target Keuangan</p>
-          <h1 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif">
-            Tujuan Tabungan
+          <h1 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif flex overflow-hidden flex-wrap">
+            {"Tujuan Tabungan".split(' ').map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                className="mr-3"
+              >
+                {word}
+              </motion.span>
+            ))}
           </h1>
         </div>
         <button

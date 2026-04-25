@@ -44,6 +44,8 @@ export default function HeroSection() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
 
+
+
   return (
     <section className="relative pt-20 pb-20 px-6 max-w-7xl mx-auto">
       {/* Background Decorative Blobs */}

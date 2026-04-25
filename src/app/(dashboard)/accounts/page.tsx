@@ -29,7 +29,7 @@ export default function AccountsPage() {
       .slice(0, 2)
       .map(t => ({
         desc: t.desc,
-        amount: t.type === 'income' ? `+${formatRupiah(t.amount)}` : `-${formatRupiah(t.amount)}`,
+        amount: t.type === 'income' ? `+Rp ${formatRupiah(t.amount)}` : `-Rp ${formatRupiah(t.amount)}`,
         date: new Date(t.date).toLocaleDateString('id-ID'),
         type: t.type
       }));
@@ -45,8 +45,18 @@ export default function AccountsPage() {
       >
         <div>
           <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-primary)] mb-1">Multi-Akun</p>
-          <h1 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif">
-            Akun Keuangan
+          <h1 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif flex overflow-hidden flex-wrap">
+            {"Akun Keuangan".split(' ').map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                className="mr-3"
+              >
+                {word}
+              </motion.span>
+            ))}
           </h1>
         </div>
         <button className="bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)] font-medium py-3 px-6 rounded-lg shadow-soft shimmer-btn flex items-center gap-2 w-fit hover:-translate-y-0.5 transition-all">

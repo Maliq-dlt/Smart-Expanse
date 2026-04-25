@@ -125,6 +125,25 @@ export default function HomePage() {
 
   const recentTransactions = transactions.slice(0, 5);
 
+  // Generate simple AI insight
+  const getFinancialInsight = () => {
+    if (transactions.length === 0) return "Belum ada transaksi. Mulai catat pengeluaran dan pemasukan Anda untuk mendapatkan wawasan keuangan otomatis.";
+    if (totalExpense > totalIncome) return "Perhatian: Pengeluaran Anda bulan ini lebih besar dari pemasukan. Pertimbangkan untuk mengurangi pengeluaran non-esensial.";
+    if (totalExpense === 0) return "Awal yang bagus! Anda belum memiliki pengeluaran bulan ini. Tetap pertahankan cashflow positif Anda.";
+    
+    // Find highest expense category
+    const topCategory = Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1])[0];
+    if (topCategory && topCategory[1] > (totalIncome * 0.4) && totalIncome > 0) {
+      return `Pengeluaran terbesar Anda ada di kategori ${topCategory[0]} (${Math.round((topCategory[1] / totalExpense) * 100)}%). Coba evaluasi kembali anggaran untuk kategori ini.`;
+    }
+    
+    if (totalIncome > 0 && totalExpense < totalIncome * 0.5) {
+      return "Luar biasa! Anda berhasil menghemat lebih dari 50% pemasukan Anda bulan ini. Pertimbangkan untuk mengalokasikannya ke investasi atau tabungan.";
+    }
+
+    return "Kondisi keuangan Anda stabil. Terus pertahankan kebiasaan mencatat transaksi secara rutin untuk memantau arus kas.";
+  };
+
   return (
     <div className="p-6 md:p-10 xl:p-16 flex flex-col gap-10 max-w-[1200px] mx-auto w-full">
       {/* Header */}
@@ -152,6 +171,28 @@ export default function HomePage() {
           </MagneticButton>
         </motion.div>
       </motion.header>
+
+      {/* AI Financial Insight */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        animate="show"
+        className="bg-gradient-to-r from-[var(--color-primary-container)]/30 to-[var(--color-tertiary-container)]/30 border border-[var(--color-primary-container)]/50 rounded-2xl p-6 shadow-sm flex gap-4 items-start relative overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-tertiary)]" />
+        <div className="w-10 h-10 rounded-full bg-[var(--color-surface-lowest)] flex items-center justify-center shrink-0 shadow-sm">
+          <span className="material-symbols-outlined text-[var(--color-primary)]">auto_awesome</span>
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface)] mb-1 flex items-center gap-2">
+            Smart AI Insight
+            <span className="bg-[var(--color-primary)] text-[var(--color-on-primary)] text-[10px] px-2 py-0.5 rounded-full animate-pulse">BETA</span>
+          </h3>
+          <p className="text-[var(--color-on-surface-variant)] text-sm md:text-base leading-relaxed">
+            {getFinancialInsight()}
+          </p>
+        </div>
+      </motion.div>
 
       {/* Summary Cards */}
       <motion.section

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useFinanceStore } from '@/store/useFinanceStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { SkeletonTransactionItem } from '@/components/ui/SkeletonCard';
 
 const fadeUp = {
@@ -27,7 +28,8 @@ function formatDate(isoString: string) {
 export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const { transactions } = useFinanceStore();
+  const { transactions, deleteTransaction } = useFinanceStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     // Simulate network delay for premium feel
@@ -47,9 +49,19 @@ export default function TransactionsPage() {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif"
+          className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif flex overflow-hidden"
         >
-          Daftar Transaksi
+          {"Daftar Transaksi".split(' ').map((word, i) => (
+            <motion.span
+              key={i}
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+              className="mr-3"
+            >
+              {word}
+            </motion.span>
+          ))}
         </motion.h1>
         <div className="relative">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-surface-variant)] text-sm">search</span>
@@ -162,30 +174,42 @@ export default function TransactionsPage() {
           ) : (
             <>
               {transactions.map((tx, i) => (
-                <motion.div
-                  key={tx.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + i * 0.08 }}
-                  className={`grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-[var(--color-surface-low)] transition-colors duration-200 cursor-pointer group ${
-                    i < transactions.length - 1 ? 'border-b border-[var(--color-surface-variant)]/30' : ''
-                  }`}
-                >
-                  <div className="col-span-2 text-sm font-mono text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-on-surface)] transition-colors">{formatDate(tx.date)}</div>
-                  <div className="col-span-4 font-medium truncate text-[var(--color-on-surface)]">{tx.desc}</div>
-                  <div className="col-span-2 flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      tx.type === 'income' ? 'bg-[var(--color-primary-container)]/20 text-[var(--color-primary)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]'
-                    }`}>
-                      <span className="material-symbols-outlined text-[16px]">{tx.type === 'income' ? 'payments' : 'receipt_long'}</span>
+                <div key={tx.id} className="relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-red-500 flex items-center justify-end px-6">
+                    <span className="material-symbols-outlined text-white">delete</span>
+                  </div>
+                  <motion.div
+                    drag="x"
+                    dragConstraints={{ left: -80, right: 0 }}
+                    dragElastic={0.1}
+                    onDragEnd={(e, info) => {
+                      if (info.offset.x < -50 && user) {
+                        deleteTransaction(tx.id, user.userId);
+                      }
+                    }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + i * 0.08 }}
+                    className={`relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center bg-[var(--color-surface-lowest)] hover:bg-[var(--color-surface-low)] transition-colors duration-200 cursor-grab active:cursor-grabbing ${
+                      i < transactions.length - 1 ? 'border-b border-[var(--color-surface-variant)]/30' : ''
+                    }`}
+                  >
+                    <div className="col-span-2 text-sm font-mono text-[var(--color-on-surface-variant)] group-hover:text-[var(--color-on-surface)] transition-colors">{formatDate(tx.date)}</div>
+                    <div className="col-span-4 font-medium truncate text-[var(--color-on-surface)]">{tx.desc}</div>
+                    <div className="col-span-2 flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        tx.type === 'income' ? 'bg-[var(--color-primary-container)]/20 text-[var(--color-primary)]' : 'bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]'
+                      }`}>
+                        <span className="material-symbols-outlined text-[16px]">{tx.type === 'income' ? 'payments' : 'receipt_long'}</span>
+                      </div>
+                      <span className="text-sm text-[var(--color-on-surface-variant)]">{tx.category}</span>
                     </div>
-                    <span className="text-sm text-[var(--color-on-surface-variant)]">{tx.category}</span>
-                  </div>
-                  <div className="col-span-2 text-sm text-[var(--color-on-surface-variant)]">{tx.account}</div>
-                  <div className={`col-span-2 text-sm font-mono text-right ${tx.type === 'expense' ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`}>
-                    {tx.type === 'expense' ? '-' : '+'} Rp {formatRupiah(tx.amount)}
-                  </div>
-                </motion.div>
+                    <div className="col-span-2 text-sm text-[var(--color-on-surface-variant)]">{tx.account}</div>
+                    <div className={`col-span-2 text-sm font-mono text-right ${tx.type === 'expense' ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'}`}>
+                      {tx.type === 'expense' ? '-' : '+'} Rp {formatRupiah(tx.amount)}
+                    </div>
+                  </motion.div>
+                </div>
               ))}
               {transactions.length === 0 && (
                 <div className="p-8 text-center text-[var(--color-outline)]">Belum ada transaksi.</div>
@@ -195,10 +219,13 @@ export default function TransactionsPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4 border-t border-[var(--color-surface-variant)] bg-[var(--color-surface-lowest)]">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4 border-t border-[var(--color-surface-variant)] bg-[var(--color-surface-lowest)] relative z-20">
           <span className="text-sm text-[var(--color-on-surface-variant)]">
             Showing <span className="font-medium text-[var(--color-on-surface)]">{transactions.length > 0 ? 1 : 0}</span> to <span className="font-medium text-[var(--color-on-surface)]">{transactions.length}</span> of <span className="font-medium text-[var(--color-on-surface)]">{transactions.length}</span> entries
           </span>
+          <div className="flex items-center gap-2">
+             <span className="text-xs text-[var(--color-outline)] italic hidden md:block">*Swipe kiri untuk menghapus</span>
+          </div>
         </div>
       </motion.section>
     </div>

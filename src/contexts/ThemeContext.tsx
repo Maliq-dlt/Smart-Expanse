@@ -38,7 +38,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setThemeState(prev => (prev === 'light' ? 'dark' : 'light'));
+    if (!document.startViewTransition) {
+      setThemeState(prev => (prev === 'light' ? 'dark' : 'light'));
+      return;
+    }
+    document.startViewTransition(() => {
+      setThemeState(prev => (prev === 'light' ? 'dark' : 'light'));
+    });
   };
 
   const setTheme = (t: Theme) => {

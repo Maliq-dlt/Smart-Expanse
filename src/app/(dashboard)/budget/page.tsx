@@ -94,8 +94,18 @@ export default function BudgetPage() {
       >
         <div>
           <p className="text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-primary)] mb-1">Oktober 2024</p>
-          <h1 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif">
-            Anggaran Bulanan
+          <h1 className="text-[48px] leading-[1.2] tracking-[-0.02em] font-normal text-[var(--color-on-surface)] font-serif flex overflow-hidden flex-wrap">
+            {"Anggaran Bulanan".split(' ').map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                className="mr-3"
+              >
+                {word}
+              </motion.span>
+            ))}
           </h1>
         </div>
         <button
@@ -147,7 +157,7 @@ export default function BudgetPage() {
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${totalAllocated > 0 ? Math.min((totalSpent / totalAllocated) * 100, 100) : 0}%` }}
-            transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
+            transition={{ type: 'spring', bounce: 0.4, duration: 1.5, delay: 0.5 }}
           />
         </div>
       </motion.div>
@@ -223,7 +233,7 @@ export default function BudgetPage() {
                     className={`${barColor} h-full rounded-full`}
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(percentage, 100)}%` }}
-                    transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 + i * 0.1 }}
+                    transition={{ type: 'spring', bounce: 0.4, duration: 1.5, delay: 0.3 + i * 0.1 }}
                   />
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-[var(--color-outline)]">
