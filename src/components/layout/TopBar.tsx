@@ -35,22 +35,25 @@ export default function TopBar() {
       <div className="flex items-center space-x-1">
         <button
           onClick={togglePrivacyMode}
-          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
           aria-label={isPrivacyMode ? "Show Balance" : "Hide Balance"}
+          title={isPrivacyMode ? "Show Balance" : "Hide Balance"}
         >
           <span className="material-symbols-outlined text-[20px]">
             {isPrivacyMode ? 'visibility_off' : 'visibility'}
           </span>
         </button>
         <button
-          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
           aria-label="Notifications"
+          title="Notifications"
         >
           <span className="material-symbols-outlined text-[20px]">notifications</span>
         </button>
         <button
-          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
           aria-label="Profile"
+          title="Profile"
         >
           <span className="material-symbols-outlined text-[20px]">account_circle</span>
         </button>
