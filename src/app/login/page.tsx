@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -14,10 +14,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMsg('');
 
     try {
       // Login user
@@ -28,7 +31,7 @@ export default function LoginPage() {
       toast.success(`Selamat datang kembali, ${dbUser.name}!`);
     } catch (error: any) {
       console.error('Login failed:', error);
-      toast.error(error.message || 'Login gagal. Periksa kembali email dan password Anda.');
+      setErrorMsg(error.message || 'Login gagal. Periksa kembali email dan password Anda.');
       setIsLoading(false);
     }
   };
@@ -85,14 +88,26 @@ export default function LoginPage() {
               <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-[var(--color-on-surface-variant)] mb-2">
                 Password
               </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface)] px-4 py-3 rounded-xl border border-transparent focus:border-[var(--color-primary)] focus:bg-[var(--color-surface-lowest)] outline-none transition-all placeholder:text-[var(--color-outline)]"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[var(--color-surface-container)] text-[var(--color-on-surface)] px-4 py-3 pr-12 rounded-xl border border-transparent focus:border-[var(--color-primary)] focus:bg-[var(--color-surface-lowest)] outline-none transition-all placeholder:text-[var(--color-outline)]"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] p-1 flex items-center justify-center transition-colors"
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
             </div>
 
             <div className="flex justify-end mb-6">
@@ -122,6 +137,40 @@ export default function LoginPage() {
           </p>
         </div>
       </motion.div>
+
+      {/* Custom Apple-like Error Popup */}
+      <AnimatePresence>
+        {errorMsg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-[var(--color-surface-lowest)] rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-[var(--color-surface-variant)]/50 flex flex-col items-center text-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-red-500 mb-6">
+                <span className="material-symbols-outlined text-3xl">error</span>
+              </div>
+              <h3 className="text-xl font-serif text-[var(--color-on-surface)] mb-2 font-semibold">Login Gagal</h3>
+              <p className="text-[var(--color-on-surface-variant)] text-sm mb-8 leading-relaxed">
+                {errorMsg}
+              </p>
+              <button
+                onClick={() => setErrorMsg('')}
+                className="w-full bg-[var(--color-on-surface)] text-[var(--color-surface)] font-medium py-3 px-6 rounded-xl hover:opacity-90 transition-opacity"
+              >
+                Coba Lagi
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

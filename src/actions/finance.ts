@@ -10,14 +10,14 @@ export async function loginUser(email: string, password?: string) {
   const existing = await db.select().from(schema.users).where(eq(schema.users.email, email));
   
   if (existing.length === 0) {
-    throw new Error('Email tidak ditemukan. Silakan daftar terlebih dahulu.');
+    throw new Error('Email tidak terdaftar.');
   }
 
   const user = existing[0];
   
   // Basic password check (in a real app, use bcrypt)
-  if (user.password && password && user.password !== password) {
-    throw new Error('Password salah.');
+  if (!user.password || user.password !== password) {
+    throw new Error('Email atau password salah.');
   }
 
   return user;
@@ -32,9 +32,6 @@ export async function signupUser(email: string, name: string, password?: string)
 
   // Create new user
   const newUser = await db.insert(schema.users).values({ email, name, password }).returning();
-  
-  // We no longer seed default accounts or budgets.
-  // The user will start with completely 0 data and add them manually.
 
   return newUser[0];
 }
@@ -63,6 +60,14 @@ export async function fetchUserData(userId: string) {
       category: t.category,
       date: t.date.toISOString(),
       account: t.accountName,
+      isSplit: t.isSplit,
+      splitDetails: t.splitDetails as any,
+      isRecurring: t.isRecurring,
+      frequency: t.frequency as any,
+      nextOccurrence: t.nextOccurrence?.toISOString(),
+      currency: t.currency,
+      originalAmount: t.originalAmount as number,
+      exchangeRate: t.exchangeRate as number,
     })),
     budgetCategories: userBudgets.map(b => ({
       id: b.id,
@@ -86,7 +91,21 @@ export async function fetchUserData(userId: string) {
 // ─── Transaction Actions ───
 export async function addTransactionAction(
   userId: string,
-  data: { desc: string; amount: number; type: 'income' | 'expense'; category: string; date: string; account: string }
+  data: { 
+    desc: string; 
+    amount: number; 
+    type: 'income' | 'expense'; 
+    category: string; 
+    date: string; 
+    account: string;
+    isSplit?: boolean;
+    splitDetails?: any;
+    isRecurring?: boolean;
+    frequency?: string;
+    currency?: string;
+    originalAmount?: number;
+    exchangeRate?: number;
+  }
 ) {
   const [newTx] = await db.insert(schema.transactions).values({
     userId,
@@ -96,6 +115,13 @@ export async function addTransactionAction(
     category: data.category,
     description: data.desc,
     date: new Date(data.date),
+    isSplit: data.isSplit || false,
+    splitDetails: data.splitDetails,
+    isRecurring: data.isRecurring || false,
+    frequency: data.frequency,
+    currency: data.currency || 'IDR',
+    originalAmount: data.originalAmount,
+    exchangeRate: data.exchangeRate,
   }).returning();
 
   // Update account balance
@@ -132,6 +158,13 @@ export async function addTransactionAction(
     category: data.category,
     date: data.date,
     account: data.account,
+    isSplit: newTx.isSplit,
+    splitDetails: newTx.splitDetails as any,
+    isRecurring: newTx.isRecurring,
+    frequency: newTx.frequency as any,
+    currency: newTx.currency,
+    originalAmount: newTx.originalAmount as number,
+    exchangeRate: newTx.exchangeRate as number,
   };
 }
 
