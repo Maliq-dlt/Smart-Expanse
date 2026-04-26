@@ -27,7 +27,7 @@ export default function HeroSection() {
   const mouseY = useMotionValue(0);
   
   // Smooth spring physics for parallax
-  const springConfig = { damping: 25, stiffness: 150 };
+  const springConfig = { damping: 30, stiffness: 100, mass: 1.5 };
   const rotateX = useSpring(useTransform(mouseY, [-500, 500], [5, -5]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [-500, 500], [-5, 5]), springConfig);
 
@@ -126,7 +126,7 @@ export default function HeroSection() {
         >
           <motion.div
             style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-            className="w-full max-w-md bg-[var(--color-surface-lowest)] rounded-3xl p-6 shadow-2xl border border-[var(--color-surface-variant)]/50 relative"
+            className="w-full max-w-md bg-[var(--color-surface-lowest)]/60 dark:bg-black/40 backdrop-blur-2xl rounded-3xl p-6 shadow-[0_16px_40px_rgba(0,0,0,0.1)] border border-[var(--color-surface-variant)]/50 relative"
           >
             {/* Glass Header */}
             <div className="flex justify-between items-center mb-8 border-b border-[var(--color-surface-variant)]/50 pb-4">
@@ -197,3 +197,4 @@ export default function HeroSection() {
     </section>
   );
 }
+

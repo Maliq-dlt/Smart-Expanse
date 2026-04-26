@@ -9,7 +9,7 @@ const Sidebar = dynamic(() => import('@/components/layout/Sidebar'), { ssr: fals
 const TopBar = dynamic(() => import('@/components/layout/TopBar'), { ssr: false });
 const MobileNav = dynamic(() => import('@/components/layout/MobileNav'), { ssr: false });
 const TransactionModal = dynamic(() => import('@/components/modals/TransactionModal'), { ssr: false });
-const CommandMenu = dynamic(() => import('@/components/ui/CommandMenu'), { ssr: false });
+const CommandPalette = dynamic(() => import('@/components/modals/CommandPalette'), { ssr: false });
 const DataLoader = dynamic(() => import('@/components/DataLoader'), { ssr: false });
 import PageTransition from '@/components/providers/PageTransition';
 
@@ -48,7 +48,7 @@ export default function DashboardLayout({
 
       <MobileNav />
       <TransactionModal />
-      <CommandMenu />
+      <CommandPalette />
     </div>
   );
 }

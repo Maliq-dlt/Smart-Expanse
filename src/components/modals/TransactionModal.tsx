@@ -7,6 +7,7 @@ import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore, TransactionType, SplitPartner } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
+import { div } from 'framer-motion/client';
 
 const categories = [
   { id: 'food', label: 'Food', icon: 'restaurant' },
@@ -64,6 +65,9 @@ export default function TransactionModal() {
   }, [isTransactionModalOpen]);
 
   const [transactionType, setTransactionType] = useState<TransactionType>('expense');
+  const [inputMode, setInputMode] = useState<'manual'|'smart'>('manual');
+  const [smartText, setSmartText] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('food');
   const [nominal, setNominal] = useState('');
   const [nama, setNama] = useState('');
@@ -121,6 +125,55 @@ export default function TransactionModal() {
 
   const removePartner = (index: number) => {
     setPartners(partners.filter((_, i) => i !== index));
+  };
+
+  const handleSmartAnalyze = async () => {
+    if (!smartText.trim() || !userId) return;
+    
+    setIsAnalyzing(true);
+    try {
+      const response = await fetch('/api/ai/parse-transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: smartText })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+         toast.error('Gagal Analisis', { description: data.error || 'Terjadi kesalahan' });
+         return;
+      }
+      
+      // Auto-fill values from AI
+      setTransactionType(data.type === 'income' ? 'income' : 'expense');
+      
+      if (data.nominal > 0) {
+         setNominal(new Intl.NumberFormat('id-ID').format(data.nominal));
+      }
+      
+      if (data.name) setNama(data.name);
+      
+      // Match category ignoring case
+      const matchedCat = categories.find(c => c.label.toLowerCase() === (data.category || '').toLowerCase());
+      if (matchedCat) setSelectedCategory(matchedCat.id);
+      
+      // Match account ignoring case
+      if (data.account && accounts.length > 0) {
+         const matchedAcc = accounts.find(a => a.name.toLowerCase().includes(data.account.toLowerCase()));
+         if (matchedAcc) setSelectedAccount(matchedAcc.name);
+      }
+      
+      toast.success('Pintar! 🎉', { description: 'Formulir telah diisi otomatis. Cek kembali sebelum menyimpan.' });
+      
+      // Switch back to manual mode to let user review
+      setInputMode('manual');
+      
+    } catch (error) {
+       toast.error('Gagal', { description: 'Gagal terhubung ke AI Assistant' });
+    } finally {
+       setIsAnalyzing(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -527,14 +580,14 @@ export default function TransactionModal() {
                       type="button"
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full bg-[var(--color-primary)] text-[var(--color-on-primary)] text-sm font-semibold py-4 rounded-xl shadow-soft flex justify-center items-center gap-2"
+                      className="w-full bg-[var(--color-primary)] text-[var(--color-on-primary)] text-sm font-semibold py-4 rounded-xl shadow-soft flex justify-center items-center gap-2 focus:outline-none focus:ring-4 focus:ring-[var(--color-primary)] focus:ring-opacity-50"
                       onClick={handleSubmit}
+                      aria-label="Simpan Transaksi"
                     >
-                      <span className="material-symbols-outlined text-xl">check_circle</span>
+                      <span className="material-symbols-outlined text-xl" aria-hidden="true">check_circle</span>
                       Simpan Transaksi
                     </motion.button>
                   </div>
-
                 </div>
               </div>
               </div>

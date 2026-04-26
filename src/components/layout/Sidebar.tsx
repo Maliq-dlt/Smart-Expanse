@@ -42,7 +42,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col h-screen w-64 border-r border-[var(--color-sidebar-border)] apple-glass py-8 px-6 shadow-soft fixed z-20 transition-colors duration-300">
       {/* Brand */}
-      <div className="mb-12">
+      <div className="mb-8">
         <Link href={isMounted && isAuthenticated ? '/home' : '/'}>
           <h1 className="text-2xl font-[var(--font-serif-heading)] tracking-tight text-[var(--color-navy)] font-bold font-serif hover:text-[var(--color-primary)] transition-colors">
             SmartExpense
@@ -52,6 +52,20 @@ export default function Sidebar() {
           Financial Wellness
         </p>
       </div>
+
+      {/* Search Bar / Command Palette Trigger */}
+      <button
+        onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+        className="mb-8 w-full flex items-center justify-between bg-[var(--color-surface-container)] hover:bg-[var(--color-surface-variant)]/50 text-[var(--color-on-surface-variant)] px-3 py-2.5 rounded-xl transition-colors border border-[var(--color-surface-variant)]/30 shadow-inner group"
+      >
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px]">search</span>
+          <span className="text-sm font-medium">Search...</span>
+        </div>
+        <div className="hidden lg:flex items-center gap-1 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded border border-[var(--color-outline)]/20 bg-[var(--color-surface-lowest)] group-hover:border-[var(--color-outline)]/40 transition-colors">
+          <span className="text-[12px]">⌘</span>K
+        </div>
+      </button>
 
       {/* Navigation */}
       <motion.nav

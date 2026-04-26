@@ -7,6 +7,7 @@ import { useFinanceStore, Goal } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah } from '@/utils/format';
 import confetti from 'canvas-confetti';
+import ProgressRing from '@/components/ui/ProgressRing';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

@@ -124,43 +124,63 @@ export const useFinanceStore = create<FinanceState>()(
 
     // ─── Transaction Actions ───
     addTransaction: async (tx, userId) => {
+      // 1. Optimistic Update Phase
+      const optimisticId = `temp-${Date.now()}`;
+      const optimisticTx = { ...tx, id: optimisticId } as Transaction;
+      
+      const previousTransactions = get().transactions;
+      const previousAccounts = get().accounts;
+      const previousBudgets = get().budgetCategories;
+
+      // Calculate new UI state immediately
+      const updatedAccounts = previousAccounts.map(acc => {
+        if (acc.name === tx.account) {
+          return {
+            ...acc,
+            balance: tx.type === 'income' ? acc.balance + tx.amount : acc.balance - tx.amount
+          };
+        }
+        return acc;
+      });
+
+      let updatedBudgets = previousBudgets;
+      if (tx.type === 'expense') {
+        const catMap: Record<string, string> = {
+          'Food': 'Makanan & Minuman',
+          'Transport': 'Transportasi',
+          'Shopping': 'Belanja Harian',
+          'Bills': 'Tagihan & Utilitas',
+        };
+        const budgetName = catMap[tx.category] || tx.category;
+        updatedBudgets = previousBudgets.map(b =>
+          b.name === budgetName ? { ...b, spent: b.spent + tx.amount } : b
+        );
+      }
+
+      // Apply optimistic state instantly
+      set({
+        transactions: [optimisticTx, ...previousTransactions],
+        accounts: updatedAccounts,
+        budgetCategories: updatedBudgets,
+      });
+
+      // 2. Server Request Phase (Background)
       try {
         const newTx = await addTransactionAction(userId, tx);
         
-        // Optimistically update local state
-        const updatedAccounts = get().accounts.map(acc => {
-          if (acc.name === tx.account) {
-            return {
-              ...acc,
-              balance: tx.type === 'income' ? acc.balance + tx.amount : acc.balance - tx.amount
-            };
-          }
-          return acc;
-        });
-
-        let updatedBudget = get().budgetCategories;
-        if (tx.type === 'expense') {
-          const catMap: Record<string, string> = {
-            'Food': 'Makanan & Minuman',
-            'Transport': 'Transportasi',
-            'Shopping': 'Belanja Harian',
-            'Bills': 'Tagihan & Utilitas',
-          };
-          const budgetName = catMap[tx.category];
-          if (budgetName) {
-            updatedBudget = get().budgetCategories.map(b =>
-              b.name === budgetName ? { ...b, spent: b.spent + tx.amount } : b
-            );
-          }
-        }
-
-        set({
-          transactions: [newTx, ...get().transactions],
-          accounts: updatedAccounts,
-          budgetCategories: updatedBudget,
-        });
+        // 3. Success: Replace temp ID with real DB ID
+        set((state) => ({
+          transactions: state.transactions.map(t => t.id === optimisticId ? newTx : t)
+        }));
       } catch (error) {
-        console.error('Failed to add transaction:', error);
+        console.error('Failed to add transaction to DB:', error);
+        // 4. Failure: Rollback UI to previous state
+        set({
+          transactions: previousTransactions,
+          accounts: previousAccounts,
+          budgetCategories: previousBudgets,
+        });
+        // Note: You would typically show a toast error here
       }
     },
 

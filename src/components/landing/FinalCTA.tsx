@@ -7,8 +7,8 @@ import Magnetic from '@/components/ui/Magnetic';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { opacity: 0, y: "100%" },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20, mass: 1 } },
 };
 
 export default function FinalCTA() {

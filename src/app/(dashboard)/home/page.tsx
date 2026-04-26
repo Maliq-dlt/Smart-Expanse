@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion, Variants, useScroll, useMotionValueEvent } from 'framer-motion';
+import { motion, Variants, useScroll, useMotionValueEvent, useReducedMotion } from 'framer-motion';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -74,6 +74,7 @@ export default function HomePage() {
   
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest > 40 && !isScrolled) setIsScrolled(true);
@@ -82,12 +83,12 @@ export default function HomePage() {
 
   useGSAP(() => {
     if (!txListRef.current) return;
-    // GSAP buttery stagger for transactions
+    // GSAP buttery stagger for transactions, skip ease if reduced motion
     gsap.fromTo(txListRef.current.children,
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, stagger: 0.05, ease: "back.out(1.2)", duration: 0.5, delay: 0.3 }
+      { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
+      { opacity: 1, y: 0, stagger: 0.05, ease: shouldReduceMotion ? "none" : "back.out(1.2)", duration: 0.5, delay: 0.3 }
     );
-  }, { scope: txListRef, dependencies: [transactions.length] });
+  }, { scope: txListRef, dependencies: [transactions.length, shouldReduceMotion] });
 
   // Get greeting based on Jakarta time
   const getGreeting = () => {
@@ -143,24 +144,25 @@ export default function HomePage() {
 
   const recentTransactions = transactions.slice(0, 5);
 
-  // Generate simple AI insight
-  const getFinancialInsight = () => {
-    if (transactions.length === 0) return "Belum ada transaksi. Mulai catat pengeluaran dan pemasukan Anda untuk mendapatkan wawasan keuangan otomatis.";
-    if (totalExpense > totalIncome) return "Perhatian: Pengeluaran Anda bulan ini lebih besar dari pemasukan. Pertimbangkan untuk mengurangi pengeluaran non-esensial.";
-    if (totalExpense === 0) return "Awal yang bagus! Anda belum memiliki pengeluaran bulan ini. Tetap pertahankan cashflow positif Anda.";
+  // Generate simple AI insight + weather
+  const getFinancialWeather = () => {
+    if (transactions.length === 0) return { icon: 'routine', color: 'text-[var(--color-outline)]', bg: 'bg-[var(--color-surface-variant)]/20', title: 'Belum Ada Data', text: "Mulai catat transaksi untuk melihat prediksi cuaca keuangan Anda." };
+    if (totalExpense > totalIncome && totalIncome > 0) return { icon: 'thunderstorm', color: 'text-rose-500', bg: 'bg-rose-500/10', title: 'Badai Pengeluaran', text: "Pengeluaran bulan ini lebih besar dari pemasukan. Kurangi pengeluaran non-esensial segera." };
+    if (totalExpense === 0 && totalIncome > 0) return { icon: 'clear_day', color: 'text-emerald-500', bg: 'bg-emerald-500/10', title: 'Sangat Cerah', text: "Belum ada pengeluaran bulan ini. Awal yang sangat bagus!" };
     
     // Find highest expense category
     const topCategory = Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1])[0];
     if (topCategory && topCategory[1] > (totalIncome * 0.4) && totalIncome > 0) {
-      return `Pengeluaran terbesar Anda ada di kategori ${topCategory[0]} (${Math.round((topCategory[1] / totalExpense) * 100)}%). Coba evaluasi kembali anggaran untuk kategori ini.`;
+      return { icon: 'partly_cloudy_day', color: 'text-amber-500', bg: 'bg-amber-500/10', title: 'Berawan Berpotensi Hujan', text: `Pengeluaran ${topCategory[0]} mengambil >40% porsi income. Waspadai pengeluaran berlebih di area ini.` };
     }
     
     if (totalIncome > 0 && totalExpense < totalIncome * 0.5) {
-      return "Luar biasa! Anda berhasil menghemat lebih dari 50% pemasukan Anda bulan ini. Pertimbangkan untuk mengalokasikannya ke investasi atau tabungan.";
+      return { icon: 'sunny', color: 'text-amber-400', bg: 'bg-amber-400/10', title: 'Cerah Bersinar', text: "Anda menghemat >50% pemasukan! Bagus sekali, pertimbangkan untuk dialokasikan ke investasi." };
     }
 
-    return "Kondisi keuangan Anda stabil. Terus pertahankan kebiasaan mencatat transaksi secara rutin untuk memantau arus kas.";
+    return { icon: 'routine', color: 'text-[var(--color-primary)]', bg: 'bg-[var(--color-primary-container)]/20', title: 'Cuaca Stabil', text: "Kondisi keuangan stabil. Tetap pertahankan kebiasaan mencatat transaksi." };
   };
+  const weather = getFinancialWeather();
 
   return (
     <div className="p-6 md:p-10 xl:p-16 flex flex-col gap-10 max-w-[1200px] mx-auto w-full">

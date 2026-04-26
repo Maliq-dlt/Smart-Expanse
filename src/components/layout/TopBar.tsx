@@ -29,9 +29,24 @@ export default function TopBar() {
       style={{ width, y, borderRadius, paddingLeft: paddingX, paddingRight: paddingX }}
       className={`md:hidden flex justify-between items-center h-14 apple-glass fixed top-0 left-0 right-0 mx-auto z-40 transition-shadow duration-300 ${isScrolled ? 'shadow-hover border border-[var(--color-surface-variant)]/50' : 'border-b border-[var(--color-surface-variant)]/50'}`}
     >
-      <h1 className={`font-bold text-[var(--color-on-surface)] font-serif transition-all duration-300 ${isScrolled ? 'text-sm ml-2' : 'text-xl'}`}>
+      <h1 className={`font-bold text-[var(--color-on-surface)] font-serif transition-all duration-300 hidden sm:block ${isScrolled ? 'text-sm ml-2' : 'text-xl'}`}>
         SmartExpense
       </h1>
+      <h1 className={`font-bold text-[var(--color-on-surface)] font-serif transition-all duration-300 sm:hidden ${isScrolled ? 'text-sm' : 'text-lg'}`}>
+        SE
+      </h1>
+
+      <button
+        onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+        className="flex-1 max-w-[200px] mx-2 flex items-center justify-between bg-[var(--color-surface-container)] hover:bg-[var(--color-surface-variant)]/50 text-[var(--color-on-surface-variant)] px-3 py-1.5 rounded-full border border-[var(--color-surface-variant)]/30 transition-colors"
+      >
+        <div className="flex items-center gap-1.5">
+          <span className="material-symbols-outlined text-[16px]">search</span>
+          <span className="text-xs font-medium">Search</span>
+        </div>
+        <span className="text-[10px] font-bold font-mono bg-[var(--color-surface-lowest)] px-1.5 py-0.5 rounded text-[var(--color-outline)] border border-[var(--color-outline)]/20">⌘K</span>
+      </button>
+
       <div className="flex items-center space-x-1">
         <button
           onClick={togglePrivacyMode}

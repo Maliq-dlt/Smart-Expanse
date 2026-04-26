@@ -37,10 +37,16 @@ export default function BudgetPage() {
   const [formName, setFormName] = useState('');
   const [formIcon, setFormIcon] = useState('shopping_cart');
   const [formAllocated, setFormAllocated] = useState('');
+  
+  // What-if Simulator State
+  const [savingsPercent, setSavingsPercent] = useState(0);
 
   const totalAllocated = budgetCategories.reduce((sum, c) => sum + c.allocated, 0);
   const totalSpent = budgetCategories.reduce((sum, c) => sum + c.spent, 0);
   const totalRemaining = totalAllocated - totalSpent;
+  
+  const savingsAmount = (totalAllocated * savingsPercent) / 100;
+  const simulatedRemaining = totalRemaining + savingsAmount;
 
   const resetForm = () => {
     setFormName('');
@@ -162,6 +168,71 @@ export default function BudgetPage() {
           />
         </div>
       </motion.div>
+
+      {/* What-If Simulator */}
+      {budgetCategories.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-gradient-to-br from-[var(--color-surface-lowest)] to-[var(--color-primary-container)]/20 rounded-2xl p-8 shadow-lg border border-[var(--color-primary)]/20 relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+             <span className="material-symbols-outlined" style={{ fontSize: '160px' }}>magic_button</span>
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="material-symbols-outlined text-[var(--color-primary)]">auto_awesome</span>
+              <h3 className="text-xl font-normal text-[var(--color-on-surface)] font-serif">Simulasi Penghematan</h3>
+            </div>
+            <p className="text-[var(--color-on-surface-variant)] text-sm mb-8 max-w-md leading-relaxed">
+              Geser slider untuk melihat proyeksi tabungan jika Anda mengurangi batas pengeluaran bulan ini.
+            </p>
+            
+            <div className="mb-8">
+               <div className="flex justify-between text-sm mb-3 font-medium">
+                 <span className="text-[var(--color-on-surface)]">Kurangi Anggaran</span>
+                 <span className="text-[var(--color-primary)] font-mono text-base">{savingsPercent}%</span>
+               </div>
+               <input 
+                 type="range" 
+                 min="0" max="50" 
+                 value={savingsPercent} 
+                 onChange={(e) => setSavingsPercent(Number(e.target.value))}
+                 className="w-full h-2 bg-[var(--color-surface-variant)] rounded-lg appearance-none cursor-pointer accent-[var(--color-primary)] transition-all"
+               />
+            </div>
+
+            <div className="bg-[var(--color-surface-lowest)]/80 backdrop-blur-md rounded-xl p-6 border border-[var(--color-surface-variant)]/50 shadow-inner">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-[var(--color-outline)] block mb-2">Proyeksi Sisa Anggaran</span>
+                    <motion.div 
+                      key={simulatedRemaining}
+                      initial={{ scale: 0.95, opacity: 0.5 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="text-3xl lg:text-4xl font-serif text-[var(--color-primary)]"
+                    >
+                      Rp {formatRupiah(simulatedRemaining, isPrivacyMode)}
+                    </motion.div>
+                  </div>
+                  <div className="md:text-right">
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-[var(--color-outline)] block mb-2">Anda Menghemat</span>
+                    <motion.div 
+                      key={savingsAmount}
+                      initial={{ y: 5, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      className="text-xl font-mono text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-lg inline-block md:block"
+                    >
+                      + Rp {formatRupiah(savingsAmount, isPrivacyMode)}
+                    </motion.div>
+                  </div>
+               </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Budget Categories */}
       {budgetCategories.length === 0 ? (
