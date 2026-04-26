@@ -1,0 +1,3 @@
+## 2026-04-26 - [Icon Accessibility and Native Tooltips]
+**Learning:** Adding only an `aria-label` to an icon-only button handles screen readers but leaves out users relying on visual hover queues for meaning. Adding a `title` attribute allows the browser to show native tooltips on hover. Further, `aria-hidden="true"` on the icon itself is useful to ensure screen readers don't misinterpret the icon text representation.
+**Action:** When creating icon-only buttons, always include `aria-label`, `title`, and explicit `focus-visible` styling. Use `aria-hidden="true"` on the icon content element itself.
