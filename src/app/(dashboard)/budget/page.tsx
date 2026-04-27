@@ -288,15 +288,19 @@ export default function BudgetPage() {
                     </span>
                     <button
                       onClick={() => openEdit(cat)}
-                      className="text-[var(--color-outline)] hover:text-[var(--color-primary)] p-1 rounded-full hover:bg-[var(--color-surface-container)] transition-colors"
+                      aria-label="Edit Kategori"
+                      title="Edit Kategori"
+                      className="text-[var(--color-outline)] hover:text-[var(--color-primary)] p-1 rounded-full hover:bg-[var(--color-surface-container)] transition-colors focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
                     >
-                      <span className="material-symbols-outlined text-lg">edit</span>
+                      <span className="material-symbols-outlined text-lg" aria-hidden="true">edit</span>
                     </button>
                     <button
                       onClick={() => deleteBudgetCategory(cat.id)}
-                      className="text-[var(--color-outline)] hover:text-[var(--color-error)] p-1 rounded-full hover:bg-[var(--color-surface-container)] transition-colors"
+                      aria-label="Hapus Kategori"
+                      title="Hapus Kategori"
+                      className="text-[var(--color-outline)] hover:text-[var(--color-error)] p-1 rounded-full hover:bg-[var(--color-surface-container)] transition-colors focus-visible:ring-2 focus-visible:ring-[var(--color-error)] outline-none"
                     >
-                      <span className="material-symbols-outlined text-lg">delete</span>
+                      <span className="material-symbols-outlined text-lg" aria-hidden="true">delete</span>
                     </button>
                   </div>
                 </div>
