@@ -1,0 +1,3 @@
+## 2025-04-30 - Icon-Only Button Accessibility Pattern
+**Learning:** Native `aria-label` alone is insufficient for complete accessibility of icon-only buttons. Screen readers might try to pronounce the visual inner text (like 'visibility_off' in a material symbols span) confusing the user, while sighted keyboard users might miss out on tooltips and focus states.
+**Action:** Always combine `aria-label` (for screen reader text), `title` (for native tooltips), `focus-visible` styling (for keyboard navigation), and `aria-hidden="true"` on the inner icon element to ensure a fully accessible icon-only button experience.
