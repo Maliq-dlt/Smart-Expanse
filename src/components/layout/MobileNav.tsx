@@ -43,10 +43,11 @@ export default function MobileNav() {
       <div className="relative -top-5">
         <button
           onClick={openTransactionModal}
-          className="bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)] p-3 rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          aria-label="Tambah Transaksi"
+          className="bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)] p-3 rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
+          aria-label="Add Transaction"
+          title="Add Transaction"
         >
-          <span className="material-symbols-outlined">add</span>
+          <span className="material-symbols-outlined" aria-hidden="true">add</span>
         </button>
       </div>
 
