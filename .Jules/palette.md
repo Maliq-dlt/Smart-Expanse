@@ -1,0 +1,3 @@
+## 2024-05-05 - Icon-only button accessibility
+**Learning:** Found a pattern of icon-only buttons missing comprehensive accessibility markers. While some had `aria-label`, they lacked `title` (for mouse hover tooltips), keyboard focus indicators, and `aria-hidden` on the visual icon itself (to prevent double-reading by screen readers).
+**Action:** When creating or modifying icon-only buttons, always ensure they have: 1. `aria-label` for screen readers, 2. matching `title` for mouse users, 3. `focus-visible` styles for keyboard users, and 4. `aria-hidden="true"` on the inner icon element.
