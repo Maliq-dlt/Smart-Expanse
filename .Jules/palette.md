@@ -1,0 +1,3 @@
+## 2024-05-18 - Added Accessibility Attributes to Icon-only Buttons
+**Learning:** Found an icon-only button without an ARIA label in the accounts page. For best accessibility, screen readers need `aria-label`, visual users benefit from a `title` tooltip, and keyboard users need explicit `focus-visible` styling to see which element is active. Additionally, Material Symbol icons should have `aria-hidden="true"` so the screen reader does not read out the literal icon name (e.g., "more vert").
+**Action:** Always include `aria-label`, `title`, and `focus-visible` styling for icon-only buttons, and use `aria-hidden="true"` on the inner icon element.
