@@ -97,8 +97,12 @@ export default function AccountsPage() {
                   <p className="text-xs text-[var(--color-outline)]">{account.type}</p>
                 </div>
               </div>
-              <button className="text-[var(--color-outline)] hover:text-[var(--color-on-surface)] p-1 rounded-full hover:bg-[var(--color-surface-container)] transition-colors">
-                <span className="material-symbols-outlined text-xl">more_vert</span>
+              <button
+                className="text-[var(--color-outline)] hover:text-[var(--color-on-surface)] p-1 rounded-full hover:bg-[var(--color-surface-container)] transition-colors focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
+                aria-label="Account options"
+                title="Account options"
+              >
+                <span className="material-symbols-outlined text-xl" aria-hidden="true">more_vert</span>
               </button>
             </div>
 
