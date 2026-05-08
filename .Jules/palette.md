@@ -1,0 +1,3 @@
+## 2024-05-08 - Added a11y attributes to icon-only buttons in Layout Components
+**Learning:** Common UI layout components (like the TopBar) lacked proper screen reader text (aria-label/title) and keyboard focus styles (focus-visible). Because the app primarily uses Indonesian, generic English defaults (like "Search") reduce accessibility for the target audience.
+**Action:** When adding or auditing icon-only buttons, always ensure they have an `aria-label` and `title` translated to Indonesian. Additionally, standardise keyboard focus styling with `focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none` and prevent screen readers from reading raw icon text with `aria-hidden="true"` on material symbols.
