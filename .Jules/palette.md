@@ -1,0 +1,3 @@
+## 2024-05-18 - TopBar Icon Button Accessibility
+**Learning:** Icon-only buttons using Material Symbols were read incorrectly by screen readers because the inner `<span>` containing the icon text (e.g., "visibility") was not hidden, and they lacked hover tooltips which makes their function ambiguous to mouse users.
+**Action:** Always apply `aria-hidden="true"` to inner icon spans, ensure the `button` has an `aria-label` in the primary application language (Indonesian), provide a matching `title` for a native tooltip, and add `focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none` for keyboard navigation.
