@@ -1,0 +1,3 @@
+## 2024-05-17 - Localized Accessibility for Icon-Only Buttons
+**Learning:** Found that icon-only buttons often lacked robust a11y support or relied on English labels in a localized app. Native hover tooltips (`title`) alongside screen reader descriptions (`aria-label`) greatly improve usability. Furthermore, visual icons must be hidden (`aria-hidden="true"`) to prevent redundancy/noise, and keyboard focus needs a clear visual indicator (`focus-visible`).
+**Action:** When auditing icon-only buttons, systematically ensure they have both `aria-label` and `title` (localized, e.g. Indonesian), apply `aria-hidden="true"` on the icon itself, and add `focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none` to the button classes.
