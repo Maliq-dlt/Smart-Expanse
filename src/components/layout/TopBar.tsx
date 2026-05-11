@@ -50,24 +50,27 @@ export default function TopBar() {
       <div className="flex items-center space-x-1">
         <button
           onClick={togglePrivacyMode}
-          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
-          aria-label={isPrivacyMode ? "Show Balance" : "Hide Balance"}
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
+          aria-label={isPrivacyMode ? "Tampilkan Saldo" : "Sembunyikan Saldo"}
+          title={isPrivacyMode ? "Tampilkan Saldo" : "Sembunyikan Saldo"}
         >
-          <span className="material-symbols-outlined text-[20px]">
+          <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
             {isPrivacyMode ? 'visibility_off' : 'visibility'}
           </span>
         </button>
         <button
-          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
-          aria-label="Notifications"
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
+          aria-label="Notifikasi"
+          title="Notifikasi"
         >
-          <span className="material-symbols-outlined text-[20px]">notifications</span>
+          <span className="material-symbols-outlined text-[20px]" aria-hidden="true">notifications</span>
         </button>
         <button
-          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center"
-          aria-label="Profile"
+          className="text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-variant)]/50 transition-colors rounded-full p-2 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
+          aria-label="Profil"
+          title="Profil"
         >
-          <span className="material-symbols-outlined text-[20px]">account_circle</span>
+          <span className="material-symbols-outlined text-[20px]" aria-hidden="true">account_circle</span>
         </button>
       </div>
     </motion.header>
