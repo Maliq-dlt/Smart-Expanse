@@ -1,0 +1,3 @@
+## 2024-05-12 - TopBar Accessibility
+**Learning:** Icon-only buttons using Google Material Symbols can be misread by screen readers if `aria-hidden="true"` is not applied to the icon element, and hover tooltips (`title`) combined with `aria-label` and focus visibility classes greatly enhance both screen reader and keyboard accessibility without changing UI design.
+**Action:** Always add `aria-hidden="true"` to inner icon spans, ensure both `title` and `aria-label` are present for icon buttons, and use `focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none` to aid keyboard navigation.
