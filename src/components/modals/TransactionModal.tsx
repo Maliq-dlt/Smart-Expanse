@@ -272,10 +272,11 @@ export default function TransactionModal() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={handleClose}
-                    className="hover:bg-[var(--color-surface-container)] transition-colors p-2 rounded-full"
-                    aria-label="Close"
+                    className="hover:bg-[var(--color-surface-container)] transition-colors p-2 rounded-full focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
+                    aria-label="Tutup"
+                    title="Tutup"
                   >
-                    <span className="material-symbols-outlined text-[var(--color-on-surface)]">close</span>
+                    <span className="material-symbols-outlined text-[var(--color-on-surface)]" aria-hidden="true">close</span>
                   </button>
                   <span className="text-xl font-bold text-[var(--color-on-surface)] font-serif italic">
                     SmartExpense
@@ -462,8 +463,8 @@ export default function TransactionModal() {
                             <span className="text-sm font-medium">{p.name}</span>
                             <div className="flex items-center gap-3">
                               <span className="text-sm font-mono">{currency} {new Intl.NumberFormat('id-ID').format(p.amount)}</span>
-                              <button onClick={() => removePartner(idx)} className="text-[var(--color-error)]">
-                                <span className="material-symbols-outlined text-lg">delete</span>
+                              <button onClick={() => removePartner(idx)} className="text-[var(--color-error)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none rounded-md" aria-label="Hapus teman" title="Hapus teman">
+                                <span className="material-symbols-outlined text-lg" aria-hidden="true">delete</span>
                               </button>
                             </div>
                           </div>
@@ -488,9 +489,11 @@ export default function TransactionModal() {
                         />
                         <button 
                           onClick={addPartner}
-                          className="bg-[var(--color-primary)] text-[var(--color-on-primary)] p-2 rounded-lg"
+                          className="bg-[var(--color-primary)] text-[var(--color-on-primary)] p-2 rounded-lg focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
+                          aria-label="Tambah teman"
+                          title="Tambah teman"
                         >
-                          <span className="material-symbols-outlined">add</span>
+                          <span className="material-symbols-outlined" aria-hidden="true">add</span>
                         </button>
                       </div>
                     </motion.div>

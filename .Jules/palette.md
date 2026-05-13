@@ -1,0 +1,3 @@
+## 2026-05-13 - Standardizing Icon-Only Buttons Accessibility
+**Learning:** Found several icon-only buttons (like modal close buttons, dynamic list add/remove buttons) lacking essential accessibility attributes (aria-label, title) and keyboard focus styles. This makes them invisible or confusing to screen reader users and difficult to operate via keyboard. The inner material-icons span also needs aria-hidden to avoid confusing readout.
+**Action:** Always add `aria-label` (in Indonesian for this app, e.g., "Tutup"), `title` for hover tooltips, and `focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none` for keyboard visibility on icon-only buttons. Apply `aria-hidden="true"` to the inner icon element.
