@@ -1,0 +1,3 @@
+## 2026-05-15 - Enhance Icon-Only Button Accessibility
+**Learning:** Icon-only buttons often lack comprehensive accessibility features. While they may have aria-labels, missing native hover tooltips (titles), explicit focus states, translated labels for localized apps, and redundant inner icon text reading by screen readers are common oversights.
+**Action:** When auditing or building icon-only buttons, ensure four elements: 1) descriptive aria-label, 2) matching title attribute for hover tooltips, 3) focus-visible styling for keyboard users, and 4) aria-hidden='true' on the inner visual icon element.
