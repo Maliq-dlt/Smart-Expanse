@@ -1,0 +1,3 @@
+## 2024-05-16 - Accessible Icon-Only Buttons
+**Learning:** For icon-only buttons, pairing `aria-label` with a native `title` tooltip enhances both screen reader accessibility and visual clarity on hover. Additionally, using `aria-hidden="true"` on the inner icon elements prevents screen readers from misinterpreting visual icons. It is also important to ensure `aria-label` and `title` translations remain consistent with the apps primary UI language.
+**Action:** Ensure all icon-only buttons include both `aria-label` and `title` attributes with appropriate translations, `focus-visible` states for keyboard navigation, and `aria-hidden="true"` on inner icons.
